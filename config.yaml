@@ -1,0 +1,15 @@
+# Paths
+audio_input_dir: "/Users/erickshaffer/Music/Audio Hijack"
+output_dir: "./transcripts"
+local_model_dir: './model' # optional
+
+# Whisper Model Configuration
+language: "en"
+model_size: "large-v2"
+compute_type: "int8"
+device: "cpu"
+batch_size: 16
+language: "en"
+
+# Speaker Diarization
+use_diarization: true
