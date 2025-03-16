@@ -50,7 +50,6 @@ def index():
 
         RecordingService.create(FILE_TO_PROCESS, category=category, new_category=new_category, subcategory=sub_category, new_subcategory=new_sub_category, company=company)
 
-
         # new_path = move_and_rename_file(file_path, category=category, sub_category=sub_category, company=company)
         return render_template('success.html', new_path=FILE_TO_PROCESS)
     

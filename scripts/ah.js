@@ -1,17 +1,10 @@
-// Add the current file to Music.app
-// #needsFile
-
+// Logs an audio event to the journal for further processing
+// #needsFile 
 let filePath = event.file.filePath;
+let basePath = "/Users/erickshaffer/code/AutoMeet";
+let journalFile = `${basePath}/data/journal.txt`;
+let timestamp = new Date().toISOString();
 
-// TODO: Clean up these paths
-let base_path = "/Users/erickshaffer/code/whisperx";
-let scriptPath = app.shellEscapeArgument(`${base_path}/src/move_and_rename.py`);
-let pythonPath = app.shellEscapeArgument("/Users/erickshaffer/miniconda3/envs/whisperx/bin/python");
-let escapedFilePath = app.shellEscapeArgument(filePath);
-
-let command = `${pythonPath} ${scriptPath} ${escapedFilePath}`;
-let [status, stdout, stderr] = app.runShellCommand(command);
-
-if (stderr) {
-  console.log(stderr);
-}
+// Just append the file entry
+let command = `echo "${filePath},${timestamp}" >> ${journalFile}`;
+app.runShellCommand(command);

@@ -1,6 +1,7 @@
 app.log
 .env
 .DS_Store
+data/*
 
 # Ignore Python cache
 __pycache__/
