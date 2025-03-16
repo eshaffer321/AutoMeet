@@ -1,4 +1,4 @@
-model/**
+data/**
 app.log
 __pycache__/*
 .env
