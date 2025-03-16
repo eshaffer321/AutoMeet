@@ -1,6 +1,7 @@
 from pony.orm import db_session, select, count
-from models import Category, Company, Subcategory
-class SuggestionsClient:
+from app.database import Category, Company, Subcategory
+
+class SuggestionsService:
 
     @classmethod
     @db_session

@@ -1,17 +1,15 @@
-from pony.orm import Database, db_session
-from models import define_entities
+from app.database.models import db
 
-def define_database(**db_params):
-    db = Database(**db_params)
-    define_entities(db)
-    db.generate_mapping(create_tables=True)
+
+def initialize_database(**db_params):
+    """Bind the database to the correct provider only when needed."""
+    if not db.provider:  # ✅ Ensures we don’t rebind
+        db.bind(**db_params)
+        db.generate_mapping(create_tables=True)
+
+def get_database():
+    """Ensure `db` is initialized before returning it."""
+    if not db.provider:
+        raise RuntimeError("Database is not initialized! Call `initialize_database()` first.")
     return db
 
-@db_session
-def seed_database(db):
-    if db.Category.select().count() == 0:  # Only seed if empty
-        print("Seeding database...")
-        category1 = db.Category(name="Other")
-        subcategory1 = db.Subcategory(name="Other", category=category1)
-    else:
-        print("Database already seeded. Skipping...")

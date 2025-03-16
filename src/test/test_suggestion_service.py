@@ -1,7 +1,7 @@
 import unittest
-from pony.orm import db_session, select, count, Database
-from models import Category, Company, Recording, Subcategory, db, setup_database
-from clients.suggestion_client import SuggestionsClient
+from pony.orm import db_session
+from app.database import Category, Company, Recording, Subcategory, initialize_database, get_database
+from app.service import SuggestionsService
 
 
 class TestCategoryRecordings(unittest.TestCase):
@@ -9,11 +9,12 @@ class TestCategoryRecordings(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up the test database once for all tests."""
-        setup_database(testing=True)  # Use in-memory DB for tests
-        cls.suggestion_client = SuggestionsClient()
+        initialize_database(provider="sqlite", filename=":memory:", create_db=True)
+        cls.suggestion_client = SuggestionsService()
 
 
     def setUp(self):
+        db = get_database()
         """Set up test data before each test."""
         db.drop_all_tables(with_all_data=True)  # No @db_session needed
         db.create_tables()

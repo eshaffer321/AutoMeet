@@ -1,15 +1,20 @@
 from datetime import datetime
-from pony.orm import Required, Set, Optional
+from pony.orm import Required, Set, Optional, Database
 
-def define_entities(db):
+db = Database() 
+
+def define_entities():
+    """Define database entities and attach them to `db`."""
+    global Category, Subcategory, Company, Recording 
+
     class Category(db.Entity):
         name = Required(str, unique=True)
-        subcategories = Set("Subcategory")  # One-to-Many relationship
+        subcategories = Set("Subcategory")
         recordings = Set("Recording")
 
     class Subcategory(db.Entity):
         name = Required(str)
-        category = Required(Category)  # Many-to-One relationship
+        category = Required(Category)
         recordings = Set("Recording")
 
     class Company(db.Entity):
@@ -24,3 +29,5 @@ def define_entities(db):
         subcategory = Required(Subcategory)
         details = Required(str)
         company = Optional(Company)  # Nullable - only needed for interviews
+
+define_entities()  

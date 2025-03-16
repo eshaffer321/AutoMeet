@@ -1,5 +1,36 @@
-data/**
 app.log
-__pycache__/*
 .env
 .DS_Store
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environment directories
+venv/
+env/
+*.venv/
+
+# Ignore editor and system files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Ignore logs and temporary files
+*.log
+logs/
+debug.log
+
+# Ignore compiled & model data (if not needed in repo)
+data/model/
+data/models/
+
+# Ignore Flask/PonyORM SQLite database (optional)
+*.db
+*.sqlite3
+
+# Ignore Python bytecode inside all directories
+**/__pycache__/

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request
 import os
 import shutil
 import sys
@@ -6,10 +6,9 @@ import threading
 import webbrowser
 import time
 from datetime import datetime
-from clients.suggestion_client import SuggestionsClient
-from clients.recording_client import RecordingClient
+from app.service import SuggestionsService, RecordingService
 
-from logger import logger
+from app.util import logger
 
 app = Flask(__name__, static_folder="static")
 
@@ -49,7 +48,7 @@ def index():
         new_sub_category = request.form['new-subcategory'].strip()
         company = request.form["company"].strip()
 
-        RecordingClient.create(FILE_TO_PROCESS, category=category, new_category=new_category, subcategory=sub_category, new_subcategory=new_sub_category, company=company)
+        RecordingService.create(FILE_TO_PROCESS, category=category, new_category=new_category, subcategory=sub_category, new_subcategory=new_sub_category, company=company)
 
 
         # new_path = move_and_rename_file(file_path, category=category, sub_category=sub_category, company=company)
@@ -63,15 +62,15 @@ def index():
 
 @app.route('/categories', methods=['GET'])
 def get_categories():
-    return SuggestionsClient.get_categories()
+    return SuggestionsService.get_categories()
 
 @app.route('/subcategories/<category>', methods=['GET'])
 def get_subcategories(category):
-    return SuggestionsClient.get_sub_categories(category)
+    return SuggestionsService.get_sub_categories(category)
 
 @app.route("/", methods=["GET"])
 def index_get():
-    categories = SuggestionsClient.get_categories()
+    categories = SuggestionsService.get_categories()
     print(categories)
     return render_template("index.html", categories=categories, filename=FILE_TO_PROCESS)
 
