@@ -24,7 +24,7 @@ class AudioPipeline():
 
         if self.model_dir:
             print(f"📂 Using local model directory: {self.model_dir}")
-            model = whisperx.load_model(self.model_size, self.device, compute_type=self.compute_type, download_root=self.model_dir)
+            model = whisperx.load_model(self.model_size, self.device, compute_type=self.compute_type, download_root=self.model_dir, language=self.language)
 
         print("🎧 Loading audio file...")
         self.audio = whisperx.load_audio(self.audio_file)

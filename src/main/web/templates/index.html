@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recording Metadata</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Recording Metadata</h2>
+        <p class="text-sm text-gray-600 mb-6">Enter details about this recording.</p>
+        <p class="text-sm text-gray-600 mb-6">File: {{ filename }}</p>
+
+        <form method="POST" class="space-y-6">
+            <!-- Recording Type Dropdown -->
+            <div class="sm:col-span-4">
+                <label for="category" class="block text-sm font-medium text-gray-900">Recording Category</label>
+                <select id="category" name="category" class="mt-2 w-full rounded-md border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    {% for option in categories %}
+                        <option id="category-item-{{ option.id }}" value="{{ option.name }}">{{ option.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- New Recording Category, (Initiall Hidden)  -->
+            <div class="sm:col-span-4" id="new-category-container" style="display: none;">
+                <label for="new-category" class="block text-sm font-medium text-gray-900">New Category</label>
+                <input type="text" name="new-category" id="new-category" placeholder="Interview, Programming Problem, Agile Ceremony" class="w-full rounded-md border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <!-- Subcategory Dropdown (Initially Hidden) -->
+            <div class="sm:col-span-4" id="subcategory-container">
+                <label for="sub-category" class="block text-sm font-medium text-gray-900">Recording Subcategory</label>
+                <select id="sub-category" name="sub-category" class="mt-2 w-full rounded-md border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </select>
+            </div>
+            <!-- New Sub Category, (Initiall Hidden)  -->
+            <div class="sm:col-span-4" id="new-subcategory-container" style="display: none;">
+                <label for="new-subcategory" class="block text-sm font-medium text-gray-900">New SubCategory</label>
+                <input type="text" name="new-subcategory" id="new-subcategory" placeholder="System Design, Sprint Planning, Arrays" class="w-full rounded-md border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <!-- Company Field -->
+            <div class="col-span-full" id="company-container">
+                <label for="company" class="block text-sm font-medium text-gray-900">Company</label>
+                <input type="text" name="company" id="company" placeholder="Company name" class="w-full rounded-md border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mt-6 flex justify-end">
+                <button type="submit" class="ml-3 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/form-handler.js') }}"></script>
+</body>
+</html>
