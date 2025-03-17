@@ -3,6 +3,8 @@ app.log
 .DS_Store
 data/*
 
+# terraform
+terraform/secrets.tfvars
 # Ignore Python cache
 __pycache__/
 *.pyc

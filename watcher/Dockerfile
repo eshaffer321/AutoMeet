@@ -6,4 +6,4 @@ COPY watcher /app/watcher
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "/app/watcher/journal_watcher.py"]
+CMD ["python", "-u", "/app/watcher/journal_watcher.py"]
