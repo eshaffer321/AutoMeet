@@ -5,6 +5,11 @@ data/*
 
 # terraform
 terraform/secrets.tfvars
+**/.terraform/**
+**/.terraform.lock.hcl
+**/tfplan
+**/terraform.tfstate.backup
+**/terraform.tfstate
 # Ignore Python cache
 __pycache__/
 *.pyc
