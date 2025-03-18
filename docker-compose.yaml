@@ -1,6 +1,5 @@
 services:
 
-  # This will move to the cloud, only for local testing
   redis:
     image: redis:7.4.2
     container_name: redis_local
@@ -14,10 +13,18 @@ services:
   watcher:
     build:
       context: .
-      dockerfile: watcher/Dockerfile
+      dockerfile: src/services/watcher/Dockerfile
     volumes:
-      - "/Users/erickshaffer/code/AutoMeet/data/:/app/data/"
+      - "./data/:/src/data/"
     environment:
       - JOURNAL_FILE=/app/data/journal.txt
+
+  # uploader:
+  #   build:
+  #     context: .
+  #     dockerfile: uploader/Dockerfile
+  #   environment:
+  #     - JOURNAL_FILE=/app/data/journal.txt
+
 volumes:
   redis_data:

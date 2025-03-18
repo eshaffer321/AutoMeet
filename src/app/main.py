@@ -1,5 +1,5 @@
-from main.audio import AudioPipeline
-from main.config import CONFIG
+from app.audio import AudioPipeline
+from app.config import CONFIG
 
 audio_file = "/Users/erickshaffer/Music/Audio Hijack/20250312 1600 Recording.mp3"
 

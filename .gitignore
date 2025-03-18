@@ -42,3 +42,5 @@ data/models/
 
 # Ignore Python bytecode inside all directories
 **/__pycache__/
+# Ignore dynaconf secret files
+.secrets.*

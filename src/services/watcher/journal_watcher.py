@@ -2,25 +2,25 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import os
 import time
-from config import JOURNAL_FILE, PROCESSED_FILE, FAILED_FILE, REDIS_HOST, REDIS_PORT, REDIS_STREAM
+from config.config import settings
 import logging
 import redis
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+redis_client = redis.Redis(host=settings.redis.host, port=settings.redis.port, decode_responses=True)
 
 class JournalHandler(FileSystemEventHandler):
     """Handles updates to the journal file."""
 
     def on_modified(self, event):
         """Triggered when the journal file is modified."""
-        if event.src_path == JOURNAL_FILE:
+        if event.src_path == settings.watcher.journal_file:
             logging.info("📄 Journal updated! Checking for new tasks...")
             self.process_new_entries()
 
     def read_processed_files(self):
         """Reads processed files into a set for quick lookup."""
-        return self._read_file(PROCESSED_FILE)
+        return self._read_file(settings.watcher.processed_file)
 
     def parse_journal_entry(self, entry: str) -> tuple:
         """Parses a journal entry into a (file_path, timestamp) tuple.
@@ -35,12 +35,10 @@ class JournalHandler(FileSystemEventHandler):
     def get_unprocessed_files(self) -> list:
         """Returns a list of tuples containing the file path and timestamp."""
         processed_files = self.read_processed_files()
-        journal_entries = self._read_file(JOURNAL_FILE)
+        journal_entries = self._read_file(settings.watcher.journal_file)
         unprocessed_files = []
-        print(journal_entries)
         
         for entry in journal_entries:
-            print(entry)
             try:
                 file_path, timestamp = self.parse_journal_entry(entry)
                 if file_path not in processed_files:
@@ -62,16 +60,16 @@ class JournalHandler(FileSystemEventHandler):
         try:
             self.publish_message(filename, timestamp)
             logging.info(f"✅ Completed: {filename}")
-            self._write_file(PROCESSED_FILE, filename)
+            self._write_file(settings.watcher.processed_file, filename)
         except Exception as e:
             logging.error(f"❌ Failed to publish event for: {filename} (Will retry later). Error: {e}")
-            self._write_file(FAILED_FILE, filename)
+            self._write_file(settings.watcher.failed_file, filename)
 
     def publish_message(self, filename, timestamp):
         message = {"file": filename, "timestamp": timestamp}
-        redis_client.xadd(REDIS_STREAM, message)
-        print(f"✅ Published event for: {filename}")
-        self._write_file(PROCESSED_FILE, filename)
+        redis_client.xadd(settings.redis.streams.journal_steam_name, message)
+        logging.info(f"✅ Published event for: {filename}")
+        self._write_file(settings.watcher.processed_file, filename)
         
 
     @staticmethod
@@ -91,7 +89,7 @@ class JournalHandler(FileSystemEventHandler):
 
 def ensure_required_files():
     """Ensures required files exist before running the watcher."""
-    for file_path in [JOURNAL_FILE, PROCESSED_FILE, FAILED_FILE]:
+    for file_path in [settings.watcher.journal_file, settings.watcher.failed_file, settings.watcher.processed_file]:
         if not os.path.exists(file_path):
             open(file_path, "a").close()
             logging.info(f"📄 Created missing file: {file_path}")
@@ -101,7 +99,7 @@ def watch():
     ensure_required_files()
     observer = Observer()
     event_handler = JournalHandler()
-    observer.schedule(event_handler, path=os.path.dirname(JOURNAL_FILE), recursive=False)
+    observer.schedule(event_handler, path=os.path.dirname(settings.watcher.journal_file), recursive=False)
     observer.start()
     logging.info("👀 Watcher started, monitoring journal for new entries...")
 
