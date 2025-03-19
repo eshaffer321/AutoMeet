@@ -16,7 +16,9 @@ web:
   paths:
     audio_input_dir: "/Users/erickshaffer/Music/Audio Hijack"
     output_dir: "./transcripts"
-    local_model_dir: "./model"  # Optional
+
+whisper_worker:
+  local_model_dir: "./model"  # Optional
 
   whisper_model:
     language: "en"
@@ -27,4 +29,3 @@ web:
 
   speaker_diarization:
     use_diarization: true
-

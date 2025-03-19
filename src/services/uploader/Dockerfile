@@ -7,7 +7,8 @@ COPY src/services/uploader /src/services/uploader
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src/config /src/config  
+COPY src/shared /src/shared
+COPY src/config /src/config 
 
 ENV PYTHONPATH=/src
 ENV DYNACONF_SETTINGS=/src/config/settings.yaml  

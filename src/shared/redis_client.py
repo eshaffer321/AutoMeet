@@ -1,5 +1,5 @@
 import redis
-from config import settings
+from config.config import settings
 
 redis_client = redis.Redis(
     host=settings.redis.host,

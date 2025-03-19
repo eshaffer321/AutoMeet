@@ -1,7 +1,9 @@
 import os
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from shared import redis_client, logger, settings 
+from config.config import settings
+from shared.redis_client import redis_client
+from shared.logging import logger 
 
 
 class JournalHandler(FileSystemEventHandler):
