@@ -10,20 +10,7 @@ variable "bucket_name" {
   default = "automeet-bucket"
 }
 
-resource "b2_application_key" "automeet" {
-  key_name     = var.b2_application_key
-  capabilities = ["readFiles"]
-}
-
-data "b2_application_key" "automeet" {
-  key_name = b2_application_key.automeet.key_name
-}
-
-output "application_key" {
-  value = data.b2_application_key.automeet.key_name
-}
-
-resource "b2_bucket" "example" {
+resource "b2_bucket" "automeet_bucket" {
   bucket_name = var.bucket_name
   bucket_type = "allPrivate"
 
@@ -35,5 +22,21 @@ resource "b2_bucket" "example" {
     algorithm = "AES256"
     mode      = "SSE-B2"
   }
-
 }
+
+resource "b2_application_key" "automeet_key" {
+  key_name     = var.b2_application_key
+  bucket_id = b2_bucket.automeet_bucket.id  
+  capabilities = [
+    "listBuckets",
+    "listFiles",
+    "readFiles",
+    "writeFiles",
+    "deleteFiles"
+  ]
+}
+
+output "application_key" {
+  value = b2_application_key.automeet_key.key_name
+}
+

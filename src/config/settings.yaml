@@ -4,6 +4,10 @@ redis:
   streams:
     journal_steam_name: journal
 
+s3:
+  url: https://s3.us-west-004.backblazeb2.com
+  bucket-name: automeet-bucket
+
 watcher:
   journal_file: data/journal.txt
   failed_file: data/failed.txt

@@ -23,6 +23,8 @@ services:
     build:
       context: .
       dockerfile: src/services/uploader/Dockerfile
+    volumes:
+      - "${AUDIO_DIR}:/mnt/audio"
 
 volumes:
   redis_data:

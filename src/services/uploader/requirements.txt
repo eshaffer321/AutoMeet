@@ -1,4 +1,4 @@
 redis
-b2sdk
+boto3
 requests
 dynaconf
