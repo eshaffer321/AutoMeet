@@ -19,12 +19,10 @@ services:
     environment:
       - JOURNAL_FILE=/app/data/journal.txt
 
-  # uploader:
-  #   build:
-  #     context: .
-  #     dockerfile: uploader/Dockerfile
-  #   environment:
-  #     - JOURNAL_FILE=/app/data/journal.txt
+  uploader:
+    build:
+      context: .
+      dockerfile: src/services/uploader/Dockerfile
 
 volumes:
   redis_data:

@@ -1,13 +1,8 @@
+import os
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import os
-import time
-from config.config import settings
-import logging
-import redis
+from shared import redis_client, logger, settings 
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-redis_client = redis.Redis(host=settings.redis.host, port=settings.redis.port, decode_responses=True)
 
 class JournalHandler(FileSystemEventHandler):
     """Handles updates to the journal file."""
@@ -15,7 +10,7 @@ class JournalHandler(FileSystemEventHandler):
     def on_modified(self, event):
         """Triggered when the journal file is modified."""
         if event.src_path == settings.watcher.journal_file:
-            logging.info("📄 Journal updated! Checking for new tasks...")
+            logger.info("📄 Journal updated! Checking for new tasks...")
             self.process_new_entries()
 
     def read_processed_files(self):
@@ -45,7 +40,7 @@ class JournalHandler(FileSystemEventHandler):
                     unprocessed_files.append((file_path, timestamp))
             except ValueError:
                 # Handle the case where the journal entry is invalid, maybe log or skip it
-                logging.error(f"Skipping invalid journal entry: {entry}")
+                logger.error(f"Skipping invalid journal entry: {entry}")
 
         return unprocessed_files
 
@@ -56,19 +51,19 @@ class JournalHandler(FileSystemEventHandler):
 
     def process_file(self, filename: str, timestamp: str):
         """Runs the processing script and logs success/failure."""
-        logging.info(f"🚀 Processing: {filename}")
+        logger.info(f"🚀 Processing: {filename}")
         try:
             self.publish_message(filename, timestamp)
-            logging.info(f"✅ Completed: {filename}")
+            logger.info(f"✅ Completed: {filename}")
             self._write_file(settings.watcher.processed_file, filename)
         except Exception as e:
-            logging.error(f"❌ Failed to publish event for: {filename} (Will retry later). Error: {e}")
+            logger.error(f"❌ Failed to publish event for: {filename} (Will retry later). Error: {e}")
             self._write_file(settings.watcher.failed_file, filename)
 
     def publish_message(self, filename, timestamp):
         message = {"file": filename, "timestamp": timestamp}
         redis_client.xadd(settings.redis.streams.journal_steam_name, message)
-        logging.info(f"✅ Published event for: {filename}")
+        logger.info(f"✅ Published event for: {filename}")
         self._write_file(settings.watcher.processed_file, filename)
         
 
@@ -92,24 +87,30 @@ def ensure_required_files():
     for file_path in [settings.watcher.journal_file, settings.watcher.failed_file, settings.watcher.processed_file]:
         if not os.path.exists(file_path):
             open(file_path, "a").close()
-            logging.info(f"📄 Created missing file: {file_path}")
+            logger.info(f"📄 Created missing file: {file_path}")
+
+import signal
 
 def watch():
-    """Starts the watcher for journal file changes."""
+    """Starts the watchdog observer without unnecessary polling."""
     ensure_required_files()
     observer = Observer()
     event_handler = JournalHandler()
     observer.schedule(event_handler, path=os.path.dirname(settings.watcher.journal_file), recursive=False)
     observer.start()
-    logging.info("👀 Watcher started, monitoring journal for new entries...")
+    
+    logger.info("👀 Watcher started, monitoring journal for new entries...")
 
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
+    def handle_exit(signum, frame):
+        """Handles termination signals for a clean exit."""
+        logger.info("🛑 Received termination signal. Stopping watcher...")
         observer.stop()
-        print("🛑 Watcher stopped.")
-    observer.join()
+
+    # Handle SIGINT (Ctrl+C) and SIGTERM (Docker stop)
+    signal.signal(signal.SIGINT, handle_exit)
+    signal.signal(signal.SIGTERM, handle_exit)
+
+    observer.join()  # Blocks the main thread without polling
 
 if __name__ == "__main__":
     watch()

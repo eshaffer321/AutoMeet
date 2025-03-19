@@ -1,7 +1,7 @@
 import unittest
 from pony.orm import db_session
-from app.database import Category, Company, Recording, Subcategory, initialize_database, get_database
-from app.service import SuggestionsService
+from services.web.database import Category, Company, Recording, Subcategory, initialize_database, get_database
+from services.web.services import SuggestionsService
 
 
 class TestCategoryRecordings(unittest.TestCase):

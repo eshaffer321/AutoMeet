@@ -6,7 +6,7 @@ import threading
 import webbrowser
 import time
 from datetime import datetime
-from app.service import SuggestionsService, RecordingService
+from services.web.services import SuggestionsService, RecordingService
 
 from app.util import logger
 

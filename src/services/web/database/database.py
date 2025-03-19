@@ -1,4 +1,4 @@
-from app.database.models import db
+from services.web.database.models import db
 
 
 def initialize_database(**db_params):

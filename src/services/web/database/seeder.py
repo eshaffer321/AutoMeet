@@ -1,4 +1,4 @@
-from app.database import get_database
+from services.web.database import get_database
 from pony.orm import db_session
 from app.util import logger
 
