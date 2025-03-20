@@ -26,5 +26,12 @@ services:
     volumes:
       - "${AUDIO_DIR}:/mnt/audio"
 
+  whisper_worker:
+    build:
+      context: .
+      dockerfile: src/services/whisper_worker/Dockerfile
+    ports:
+      - 8000:8000
+
 volumes:
   redis_data:

@@ -1,4 +1,7 @@
 redis
-boto3
+# Temporary workaround for Backblaze B2's lack of support for 'x-amz-sdk-checksum-algorithm' header.
+# Remove this workaround once Backblaze resolves the issue.
+boto3==1.35.99 
+botocore==1.35.99
 requests
 dynaconf

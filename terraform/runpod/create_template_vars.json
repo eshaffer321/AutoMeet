@@ -1,0 +1,18 @@
+{
+    "query": "mutation saveTemplate($input: SaveTemplateInput!) { saveTemplate(input: $input) { id name imageName ports volumeInGb volumeMountPath } }",
+    "variables": {
+      "input": {
+        "containerDiskInGb": 5,
+        "dockerArgs": "sleep infinity",
+        "env": [
+          { "key": "WHISPER_WORKER__LOCAL_MODEL_DIR", "value": "/runpod-volume" },
+          { "key": "RUN_MODE", "value": "serverless" }
+        ],
+        "imageName": "ubuntu:latest", 
+        "name": "WhisperX Serverless",
+        "ports": "8000/http,22/tcp",
+        "readme": "## WhisperX Serverless Model Inference",
+        "volumeInGb": 10
+      }
+    }
+  }
