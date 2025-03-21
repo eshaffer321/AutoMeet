@@ -33,7 +33,7 @@ def upload_file(filepath, timestamp):
 
 def publish_message(s3_key):
     message = {"key": s3_key}
-    steam_name = settings.redis.steams.audio_upload_complete_remote \
+    steam_name = settings.redis.streams.audio_upload_complete_remote \
         if settings.uploader.run_mode == "runpod" \
         else settings.redis.streams.audio_upload_complete_local 
 

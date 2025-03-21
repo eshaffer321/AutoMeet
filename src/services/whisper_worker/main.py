@@ -1,23 +1,20 @@
 import whisperx
-import torchvision
 from config.config import settings
 from shared.logging import logger
-
-torchvision.disable_beta_transforms_warning()
 
 class AudioPipeline():
     def __init__(self, audio_file):
         model_config = settings.whisper_worker.whisper_model
         self.batch_size = model_config.batch_size 
         self.compute_type = model_config.compute_type 
-        self.device = model_config.compute_type 
+        self.device = model_config.device 
         self.model_dir = settings.whisper_worker.local_model_dir 
         self.model_size = model_config.model_size 
         self.result = None
         self.audio_file = audio_file
         self._hf_token = settings.whisper_worker.hf_token 
         self.language = model_config.language
-        logger.info("🚀 Initialized AudioPipeline!")
+        logger.info(f"🚀 Initialized AudioPipeline with device: {self.device}, model: {self.model_size}, compute type: {self.compute_type}, batch size: {self.batch_size}")
 
     def transcribe_with_whisper(self):
         logger.info("🎤 Loading Whisper model...")

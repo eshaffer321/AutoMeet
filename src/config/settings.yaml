@@ -3,10 +3,17 @@ redis:
   port: 6379
   streams:
     journal_steam_name: journal
+    audio_upload_complete_local: audio_upload_complete_local
+    audio_upload_complete_remote: audio_upload_complete_remote
 
 s3:
   url: https://s3.us-west-004.backblazeb2.com
   bucket-name: automeet-bucket
+  application_key:
+  application_key_id:
+
+runpod:
+  api_key:
 
 watcher:
   journal_file: data/journal.txt
@@ -16,6 +23,11 @@ watcher:
 uploader:
   consumer_group: uploader-group
   audio_dir: /mnt/audio
+  run_mode: runpod
+
+runpod_trigger:
+  consumer_group: runpod_trigger
+  
 
 web:
   paths:
@@ -24,6 +36,7 @@ web:
 
 whisper_worker:
   local_model_dir: "./model"  # Optional
+  hf_token:
 
   whisper_model:
     language: "en"

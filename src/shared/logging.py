@@ -11,6 +11,6 @@ file_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(mes
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
 
-logging.basicConfig(level=logging.INFO, handlers=[file_handler, console_handler])
+logging.basicConfig(level=logging.DEBUG, handlers=[file_handler, console_handler])
 
 logger = logging.getLogger("AutoMeet")

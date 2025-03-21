@@ -1,17 +1,17 @@
-FROM python:3.10-slim
+FROM ghcr.io/jim60105/whisperx:no_model
 
 WORKDIR /src
 
+# Copy shared modules and configuration
 COPY src/services/whisper_worker/requirements.txt .
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/services/whisper_worker /src/services/whisper_worker
-
 COPY src/shared /src/shared
 COPY src/config /src/config
 
+# Set environment variables
 ENV PYTHONPATH=/src
 ENV DYNACONF_SETTINGS=/src/config/settings.yaml  
 
-CMD ["python", "-u", "/src/services/whisper_worker/handler.py", "--rp_serve_api", "--rp_api_host", "0.0.0.0"]
+ENTRYPOINT [ "python", "-u", "/src/services/whisper_worker/handler.py" ]
