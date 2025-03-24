@@ -30,7 +30,7 @@ jobs:
             cd /opt/automeet
 
             echo "[*] Creating secrets.env..."
-            cat <<EOF > secrets.env
+            cat <<EOF > .env
             AUDIO_DIR=/opt/
             DYNACONF_S3__APPLICATION_KEY=${{ secrets.DYNACONF_S3__APPLICATION_KEY }}
             DYNACONF_S3__APPLICATION_KEY_ID=${{ secrets.DYNACONF_S3__APPLICATION_KEY_ID }}
