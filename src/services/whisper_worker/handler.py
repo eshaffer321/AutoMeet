@@ -6,10 +6,14 @@ import json
 from config.config import settings
 from shared.logging import logger
 from shared.s3_client import s3
+from shared.redis_client import redis_client
 from main import AudioPipeline
 
 model_dir = settings.whisper_worker.local_model_dir
 output_file = "audio.mp3"
+transcription_complete_stream = settings.redis.transcription_complete
+is_publish_enabled = os.environ.get("REDIS_ENALBED", False)
+
 def handler(event):
     """
     Pulls audio file from s3, transcribes it with whisperx, and uploads result to s3
@@ -39,6 +43,12 @@ def handler(event):
             ContentType='application/json' 
         )
 
+        if is_publish_enabled:
+            logger.info(f"Signaling upload completion for {s3_path}")
+            publish_message(s3_path)
+        else:
+            logger.info(f"Skipping publishing because message publishing disabled")
+
         return {"output": result_json}
     except Exception as e:
         error_message = traceback.format_exc()
@@ -47,6 +57,11 @@ def handler(event):
         # If there's an error, return it
         os._exit(1)  # This will terminate the process immediately
         return {"error": str(e)}
+    
+def publish_message(transcription_s3_path):
+    message = {"key": transcription_s3_path}
+    redis_client.xadd(transcription_complete_stream, message)
+    logger.info(f"Publishing event to {transcription_complete_stream}. Message {message}")
 
 
 # Start the serverless function

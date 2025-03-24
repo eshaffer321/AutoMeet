@@ -54,6 +54,9 @@ class AudioPipeline():
         for segment in self.result['segments']:
             if 'speaker' not in segment:
                 continue
+            if not segment['text']:
+                logger.info(f"Skipping {segment} due to empty text")
+                continue
             next_speaker = segment['speaker']
             
             if next_speaker == current_speaker:

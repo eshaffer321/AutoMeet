@@ -5,6 +5,7 @@ redis:
     journal_steam_name: journal
     audio_upload_complete_local: audio_upload_complete_local
     audio_upload_complete_remote: audio_upload_complete_remote
+    transcription_complete: transcription_complete
 
 s3:
   url: https://s3.us-west-004.backblazeb2.com
