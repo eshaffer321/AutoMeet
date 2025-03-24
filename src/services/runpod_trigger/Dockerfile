@@ -1,4 +1,4 @@
-FROM ghcr.io/jim60105/whisperx:no_model
+FROM python:3.10-slim
 
 WORKDIR /src
 
