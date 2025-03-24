@@ -1,5 +1,8 @@
+#!/bin/bash
+set -e
+
 # 1. Uninstall any old versions (if any)
-sudo apt-get remove docker docker-engine docker.io containerd runc
+sudo apt-get remove -y docker docker-engine docker.io containerd runc
 
 # 2. Update the apt package index and install dependencies
 sudo apt-get update
@@ -25,3 +28,14 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
 # 7. Verify Docker installation
 sudo docker run hello-world
+
+# 8. Install Docker Compose (v2)
+# Download the latest stable release (update version as needed)
+COMPOSE_VERSION="v2.29.7"  # Adjust this version if needed
+sudo curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+# 9. Apply executable permissions to the binary
+sudo chmod +x /usr/local/bin/docker-compose
+
+# 10. Verify Docker Compose installation
+docker-compose --version
