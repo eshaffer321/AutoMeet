@@ -32,10 +32,10 @@ jobs:
             echo "[*] Creating secrets.env..."
             cat <<EOF > .env
             AUDIO_DIR=/opt/
-            DYNACONF_S3__APPLICATION_KEY=${{ secrets.DYNACONF_S3__APPLICATION_KEY }}
-            DYNACONF_S3__APPLICATION_KEY_ID=${{ secrets.DYNACONF_S3__APPLICATION_KEY_ID }}
-            DYNACONF_RUNPOD__API_KEY=${{ secrets.DYNACONF_RUNPOD__API_KEY }}
-            DYNACONF_REDIS__PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            DYNACONF_s3__application_key=${{ secrets.DYNACONF_S3__APPLICATION_KEY }}
+            DYNACONF_S3__applicaion_key_id=${{ secrets.DYNACONF_S3__APPLICATION_KEY_ID }}
+            DYNACONF_runpod__api_key=${{ secrets.DYNACONF_RUNPOD__API_KEY }}
+            DYNACONF_redis__password=${{ secrets.REDIS_PASSWORD }}
             REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
             EOF
 
