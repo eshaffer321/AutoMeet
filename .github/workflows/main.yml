@@ -1,0 +1,43 @@
+name: Deploy to VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USERNAME }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            echo "[*] Ensuring repo is cloned..."
+
+            if [ ! -d /opt/automeet ]; then
+              git clone https://github.com/eshaffer321/AutoMeet.git /opt/automeet
+            else
+              cd /opt/automeet
+              git pull origin main
+            fi
+
+            cd /opt/automeet
+
+            echo "[*] Creating secrets.env..."
+            cat <<EOF > secrets.env
+            AUDIO_DIR=/mnt/audio
+            DYNACONF_S3__APPLICATION_KEY=${{ secrets.S3_APPLICATION_KEY }}
+            DYNACONF_S3__APPLICATION_KEY_ID=${{ secrets.S3_APPLICATION_KEY_ID }}
+            DYNACONF_RUNPOD__API_KEY=${{ secrets.RUNPOD_API_KEY }}
+            DYNACONF_REDIS__PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            EOF
+
+            echo "[*] Deploying via Docker Compose..."
+            docker-compose pull
+            docker-compose --profile prod up -d --build
