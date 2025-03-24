@@ -1,13 +1,13 @@
 variable "b2_application_key" {
   type        = string
   description = "The name of the application"
-  default = "automeet"
+  default     = "automeet"
 }
 
 variable "bucket_name" {
-  type = string
+  type        = string
   description = "Name of the b2 bucket to hold the audio data"
-  default = "automeet-bucket"
+  default     = "automeet-bucket"
 }
 
 resource "b2_bucket" "automeet_bucket" {
@@ -22,11 +22,15 @@ resource "b2_bucket" "automeet_bucket" {
     algorithm = "AES256"
     mode      = "SSE-B2"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "b2_application_key" "automeet_key" {
-  key_name     = var.b2_application_key
-  bucket_id = b2_bucket.automeet_bucket.id  
+  key_name  = var.b2_application_key
+  bucket_id = b2_bucket.automeet_bucket.id
   capabilities = [
     "listBuckets",
     "listFiles",
@@ -34,6 +38,10 @@ resource "b2_application_key" "automeet_key" {
     "writeFiles",
     "deleteFiles"
   ]
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 output "application_key" {
