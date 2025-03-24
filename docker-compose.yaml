@@ -4,10 +4,15 @@ services:
     image: redis:7.4.2
     container_name: redis_local
     restart: always
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    profiles:
+      - prod
+      - test
 
   # watcher, runs locally always
   watcher:
@@ -18,6 +23,8 @@ services:
       - "./data/:/src/data/"
     environment:
       - JOURNAL_FILE=/app/data/journal.txt
+    profiles:
+      - local
 
   uploader:
     build:
@@ -25,13 +32,23 @@ services:
       dockerfile: src/services/uploader/Dockerfile
     volumes:
       - "${AUDIO_DIR}:/mnt/audio"
+    environment:
+      - DYNACONF_S3__APPLICATION_KEY
+      - DYNACONF_S3__APPLICATION_KEY_ID
+    profiles:
+      - local
 
   runpod_trigger:
     build:
       context: .
       dockerfile: src/services/runpod_trigger/Dockerfile
+    environment:
+      - DYNACONF_RUNPOD__API_KEY
     ports:
       - 8000:8000
+    profiles:
+      - prod
+      - test
 
 volumes:
   redis_data:
