@@ -45,8 +45,6 @@ services:
       dockerfile: src/services/runpod_trigger/Dockerfile
     env_file:
       - secrets.env
-    environment:
-      - DYNACONF_RUNPOD__API_KEY
     ports:
       - 8000:8000
     profiles:
