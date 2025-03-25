@@ -35,8 +35,7 @@ jobs:
             DYNACONF_s3__application_key=${{ secrets.DYNACONF_S3__APPLICATION_KEY }}
             DYNACONF_s3__application_key_id=${{ secrets.DYNACONF_S3__APPLICATION_KEY_ID }}
             DYNACONF_runpod__api_key=${{ secrets.DYNACONF_RUNPOD__API_KEY }}
-            DYNACONF_redis__password=${{ secrets.REDIS_PASSWORD }}
-            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            DYNACONF_redis__password=${{ secrets.DYNACONF_REDIS__PASSWORD }}
             EOF
 
             echo "[*] Deploying via Docker Compose..."

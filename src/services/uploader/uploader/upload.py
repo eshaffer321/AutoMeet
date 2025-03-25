@@ -39,24 +39,29 @@ def publish_message(s3_key):
 
     logger.info(f"Signalling for processing of {s3_key} to {steam_name}")
     redis_client.xadd(steam_name, message)
- 
-while True:
-    logger.info(f"Waiting for messages from stream {steam_name}")
-    
-    messages = redis_client.xreadgroup(
-        groupname=consumer_group,
-        consumername=consumer_name,
-        streams={steam_name: ">"},
-        count=1,
-        block=0
-    )
 
-    if messages:
-        for _, entries in messages:
-            for entry_id, data in entries:
-                logger.info(f"Processing: {data}")
-                try:
-                    upload_file(data['file'], data['timestamp'])
-                    redis_client.xack(steam_name, consumer_group, entry_id)  # Acknowledge message
-                except Exception as e:
-                    logger.error(f"Failed to upload file {data['file']}: {str(e)}", exc_info=True)
+def upload():
+    while True:
+        logger.info(f"Waiting for messages from stream {steam_name}")
+        
+        messages = redis_client.xreadgroup(
+            groupname=consumer_group,
+            consumername=consumer_name,
+            streams={steam_name: ">"},
+            count=1,
+            block=0
+        )
+
+        if messages:
+            for _, entries in messages:
+                for entry_id, data in entries:
+                    logger.info(f"Processing: {data}")
+                    try:
+                        upload_file(data['file'], data['timestamp'])
+                        redis_client.xack(steam_name, consumer_group, entry_id)  # Acknowledge message
+                    except Exception as e:
+                        logger.error(f"Failed to upload file {data['file']}: {str(e)}", exc_info=True)
+
+if __name__ == "__main__":
+    upload()
+

@@ -13,6 +13,7 @@ services:
       - DYNACONF_WATCHER__DATA_DIR=/src/data
     profiles:
       - local
+      - test
 
   uploader:
     build:
@@ -22,6 +23,7 @@ services:
       - "${AUDIO_DIR}:/mnt/audio"
     profiles:
       - local
+      - test
 
   redis:
     image: redis:7.4.2
@@ -37,8 +39,7 @@ services:
     volumes:
       - redis_data:/data
     profiles:
-      - prod
-      - test
+      - redis
 
   runpod_trigger:
     build:

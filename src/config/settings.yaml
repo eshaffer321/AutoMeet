@@ -1,5 +1,5 @@
 redis:
-  host: redis_local
+  host: capital-cricket-43383.upstash.io
   port: 6379
   streams:
     journal_steam_name: journal
@@ -27,11 +27,7 @@ uploader:
 runpod_trigger:
   consumer_group: runpod_trigger
   
-
 web:
-  paths:
-    audio_input_dir: "/Users/erickshaffer/Music/Audio Hijack"
-    output_dir: "./transcripts"
 
 whisper_worker:
   local_model_dir: "./model"  # Optional
