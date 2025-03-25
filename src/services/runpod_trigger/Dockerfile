@@ -2,16 +2,12 @@ FROM python:3.10-slim
 
 WORKDIR /src
 
-# Copy shared modules and configuration
-COPY src/services/runpod_trigger/requirements.txt .
+COPY src/services/watcher/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src/services/runpod_trigger /src/services/runpod_trigger
-COPY src/shared /src/shared
-COPY src/config /src/config
+COPY src /src
 
-# Set environment variables
 ENV PYTHONPATH=/src
 ENV DYNACONF_SETTINGS=/src/config/settings.yaml  
 
-ENTRYPOINT [ "python", "-u", "/src/services/runpod_trigger/main.py" ]
+CMD ["python", "-m", "services.runpod_trigger.runpod_trigger"]
