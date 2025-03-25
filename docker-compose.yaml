@@ -52,5 +52,17 @@ services:
       - prod
       - test
 
+  web:
+    build:
+      context: .
+      dockerfile: src/services/web/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+    profiles:
+      - prod
+      - test
+
 volumes:
   redis_data:
