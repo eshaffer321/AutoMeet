@@ -10,6 +10,13 @@ data "cloudflare_zone" "automeet_cc" {
   zone_id = var.cloudflare_zone_id
 }
 
+locals {
+  tunnel_hostnames = {
+    redis = "redis.${data.cloudflare_zone.automeet_cc.name}"
+    web   = "web.${data.cloudflare_zone.automeet_cc.name}"
+  }
+}
+
 ################
 # SSH CONFIG
 ################
@@ -26,10 +33,12 @@ resource "cloudflare_dns_record" "ssh" {
 # TUNNEL
 ###############
 resource "cloudflare_dns_record" "tunnel_dns" {
+  for_each = local.tunnel_hostnames
+
   zone_id = var.cloudflare_zone_id
-  name    = data.cloudflare_zone.automeet_cc.name
+  name    = each.value
   type    = "CNAME"
-  content = "${var.cloudflare_tunnel_id}.cfargotunnel.com"
+  content   = "${var.cloudflare_tunnel_id}.cfargotunnel.com"
   proxied = true
   ttl     = 1
 }
@@ -46,8 +55,8 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel_config" {
         service  = "tcp://localhost:6379"
       },
       {
-        hostname = "app.${data.cloudflare_zone.automeet_cc.name}"
-        service  = "https://localhost:8080"
+        hostname = "web.${data.cloudflare_zone.automeet_cc.name}"
+        service  = "http://localhost:8080"
       },
       {
         service = "http_status:404"
