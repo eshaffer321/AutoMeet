@@ -1,5 +1,5 @@
 from pony.orm import db_session
-from services.web.database import Category, Subcategory, Company, Recording
+from services.web.app.database import Category, Subcategory, Company, Recording
  
 class RecordingService:
 

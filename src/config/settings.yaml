@@ -17,9 +17,7 @@ runpod:
   api_key:
 
 watcher:
-  journal_file: data/journal.txt
-  failed_file: data/failed.txt
-  processed_file: data/processed.txt
+  data_dir: "~/AudioHijackLogs" 
 
 uploader:
   consumer_group: uploader-group

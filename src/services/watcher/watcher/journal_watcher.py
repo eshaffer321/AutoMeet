@@ -5,19 +5,23 @@ from config.config import settings
 from shared.redis_client import redis_client
 from shared.logging import logger 
 
+DATA_DIR = os.path.expanduser(settings.watcher.data_dir)
+JOURNAL_FILE = os.path.join(DATA_DIR, "journal.txt")
+PROCESSED_FILE = os.path.join(DATA_DIR, "processed.txt")
+FAILED_FILE = os.path.join(DATA_DIR, "failed.txt")
 
 class JournalHandler(FileSystemEventHandler):
     """Handles updates to the journal file."""
 
     def on_modified(self, event):
         """Triggered when the journal file is modified."""
-        if event.src_path == settings.watcher.journal_file:
+        if event.src_path == JOURNAL_FILE:
             logger.info("📄 Journal updated! Checking for new tasks...")
             self.process_new_entries()
 
     def read_processed_files(self):
         """Reads processed files into a set for quick lookup."""
-        return self._read_file(settings.watcher.processed_file)
+        return self._read_file(PROCESSED_FILE)
 
     def parse_journal_entry(self, entry: str) -> tuple:
         """Parses a journal entry into a (file_path, timestamp) tuple.
@@ -32,7 +36,7 @@ class JournalHandler(FileSystemEventHandler):
     def get_unprocessed_files(self) -> list:
         """Returns a list of tuples containing the file path and timestamp."""
         processed_files = self.read_processed_files()
-        journal_entries = self._read_file(settings.watcher.journal_file)
+        journal_entries = self._read_file(JOURNAL_FILE)
         unprocessed_files = []
         
         for entry in journal_entries:
@@ -57,16 +61,16 @@ class JournalHandler(FileSystemEventHandler):
         try:
             self.publish_message(filename, timestamp)
             logger.info(f"✅ Completed: {filename}")
-            self._write_file(settings.watcher.processed_file, filename)
+            self._write_file(PROCESSED_FILE, filename)
         except Exception as e:
             logger.error(f"❌ Failed to publish event for: {filename} (Will retry later). Error: {e}")
-            self._write_file(settings.watcher.failed_file, filename)
+            self._write_file(FAILED_FILE, filename)
 
     def publish_message(self, filename, timestamp):
         message = {"file": filename, "timestamp": timestamp}
         redis_client.xadd(settings.redis.streams.journal_steam_name, message)
         logger.info(f"✅ Published event for: {filename}")
-        self._write_file(settings.watcher.processed_file, filename)
+        self._write_file(PROCESSED_FILE, filename)
         
 
     @staticmethod
@@ -86,7 +90,7 @@ class JournalHandler(FileSystemEventHandler):
 
 def ensure_required_files():
     """Ensures required files exist before running the watcher."""
-    for file_path in [settings.watcher.journal_file, settings.watcher.failed_file, settings.watcher.processed_file]:
+    for file_path in [JOURNAL_FILE, FAILED_FILE, PROCESSED_FILE]:
         if not os.path.exists(file_path):
             open(file_path, "a").close()
             logger.info(f"📄 Created missing file: {file_path}")
@@ -98,7 +102,7 @@ def watch():
     ensure_required_files()
     observer = Observer()
     event_handler = JournalHandler()
-    observer.schedule(event_handler, path=os.path.dirname(settings.watcher.journal_file), recursive=False)
+    observer.schedule(event_handler, path=os.path.dirname(JOURNAL_FILE), recursive=False)
     observer.start()
     
     logger.info("👀 Watcher started, monitoring journal for new entries...")

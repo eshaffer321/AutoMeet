@@ -10,7 +10,7 @@ services:
     volumes:
       - "./data/:/src/data/"
     environment:
-      - JOURNAL_FILE=/app/data/journal.txt
+      - DYNACONF_WATCHER__DATA_DIR=/src/data
     profiles:
       - local
 

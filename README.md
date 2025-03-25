@@ -26,6 +26,8 @@ services:
       - "${AUDIO_DIR}:/mnt/audio"
 ```
 
+Run the ./scripts/setup.sh to set up the symlink for audiohighjack file watching
+
 #### **Provision Backblaze Resources with Terraform**
 AutoMeet uses **Terraform** to create the required **Backblaze B2 storage and application keys**.
 
