@@ -15,6 +15,7 @@ s3:
 
 runpod:
   api_key:
+  endpoint_id: txbdniwz0qsow7
 
 watcher:
   data_dir: "~/AudioHijackLogs" 

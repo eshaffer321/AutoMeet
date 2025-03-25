@@ -2,8 +2,11 @@ import redis
 from shared.logging import logger
 from config.config import settings
 from shared.redis_client import redis_client
+from shared.runpod_client import RunPodClient
+from datetime import datetime
 
 def consume_stream():
+    runpod_client = RunPodClient()
     consumer_group = settings.runpod_trigger.consumer_group
     stream_name = settings.redis.streams.audio_upload_complete_remote
     consumer_name = "consumer_1"
@@ -30,7 +33,14 @@ def consume_stream():
                     logger.info(f"Processing: {data}")
                     try:
                         s3_key = data['key']
-                        # TODO: Trigger RunPod call here
+                        job_id = runpod_client.run_async({'key': s3_key}) 
+                        logger.info(f"Runpod job id: {job_id}")
+                        # Not being used now. For observability in the future
+                        redis_client.xadd("runpod_jobs_fired", {
+                            "job_id": job_id,
+                            "s3_key": s3_key,
+                            "timestamp": datetime.utcnow().isoformat()
+                        })
                         redis_client.xack(stream_name, consumer_group, entry_id)
                     except Exception as e:
                         logger.error(f"❌ Failed to trigger runpod for {data.get('file')}: {str(e)}", exc_info=True)
