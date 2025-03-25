@@ -15,25 +15,23 @@ resource "hcloud_server" "server" {
   }
 
   provisioner "file" {
-    source      = "${path.module}/scripts/cloudflared-setup.sh"
-    destination = "/root/cloudflared_setup.sh"
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/scripts/nginx.sh"
-    destination = "/root/nginx.sh"
+    source      = "${path.module}/scripts/setup.sh"
+    destination = "/root/setup.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "chmod +x /root/cloudflared_setup.sh",
-      "/root/cloudflared_setup.sh '${base64encode(jsonencode({
-        a = var.cloudflare_account_id
-        t = cloudflare_zero_trust_tunnel_cloudflared.hetzner_tunnel.id
-        s = random_id.tunnel_secret.b64_std
-      }))}'",
-      # "chmod +x /root/nginx.sh",
-      # "/root/nginx.sh"
+      "chmod +x /root/setup.sh",
+      "/root/setup.sh",
+    ]
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /etc/cloudflared",
+      "echo ${var.cloudflare_tunnel_base64_cred} > /etc/cloudflared/hetzner.json",
+      "cat /etc/cloudflared/hetzner.json | xargs cloudflared service install",
+      "systemctl restart cloudflared"
     ]
   }
 }
@@ -43,6 +41,11 @@ resource "hcloud_ssh_key" "default" {
   public_key = file("~/.ssh/id_hetzner.pub")
 }
 
+resource "hcloud_ssh_key" "github_action" {
+  name = "github_action_key"
+  public_key = file("~/.ssh/github_autodeploy.pub")
+}
+
 resource "hcloud_firewall" "default" {
   name = "server-firewall"
 
@@ -50,20 +53,6 @@ resource "hcloud_firewall" "default" {
     direction  = "in"
     protocol   = "tcp"
     port       = "22"
-    source_ips = ["0.0.0.0/0"]
-  }
-
-  rule {
-    direction  = "in"
-    protocol   = "tcp"
-    port       = "80"
-    source_ips = ["0.0.0.0/0"]
-  }
-
-  rule {
-    direction  = "in"
-    protocol   = "tcp"
-    port       = "443"
     source_ips = ["0.0.0.0/0"]
   }
 }

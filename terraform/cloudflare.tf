@@ -11,48 +11,46 @@ data "cloudflare_zone" "automeet_cc" {
 }
 
 ################
-# TUNNEL
-###############
-resource "cloudflare_zero_trust_tunnel_cloudflared" "hetzner_tunnel" {
-  account_id    = var.cloudflare_account_id
-  name          = "hetzner_tunnel"
-  config_src    = "cloudflare"
-  tunnel_secret = random_id.tunnel_secret.b64_std
+# SSH CONFIG
+################
+resource "cloudflare_dns_record" "ssh" {
+  zone_id = var.cloudflare_zone_id
+  name    = "automeet-ssh"
+  type    = "A"
+  content   = hcloud_server.server.ipv4_address
+  ttl     = 60
+  proxied = false
 }
 
+################
+# TUNNEL
+###############
 resource "cloudflare_dns_record" "tunnel_dns" {
   zone_id = var.cloudflare_zone_id
   name    = data.cloudflare_zone.automeet_cc.name
   type    = "CNAME"
-  content = "${cloudflare_zero_trust_tunnel_cloudflared.hetzner_tunnel.id}.cfargotunnel.com"
+  content = "${var.cloudflare_tunnel_id}.cfargotunnel.com"
   proxied = true
   ttl     = 1
 }
 
-resource "random_id" "tunnel_secret" {
-  byte_length = 32
-}
-
-output "tunnel_secret_base64" {
-  value = base64encode(jsonencode({
-    a = var.cloudflare_account_id
-    t = cloudflare_zero_trust_tunnel_cloudflared.hetzner_tunnel.id
-    s = random_id.tunnel_secret.id
-  }))
-  sensitive = true
-}
-
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel_config" {
   account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.hetzner_tunnel.id
+  tunnel_id  = var.cloudflare_tunnel_id
   source     = "cloudflare"
 
   config = {
-    ingress = [{
-      hostname = data.cloudflare_zone.automeet_cc.name
-      service  = "http://localhost:8000"
-      }, {
-      service = "http_status:404"
+    ingress = [
+      {
+        hostname = "redis.${data.cloudflare_zone.automeet_cc.name}"
+        service  = "tcp://localhost:6379"
+      },
+      {
+        hostname = "app.${data.cloudflare_zone.automeet_cc.name}"
+        service  = "https://localhost:8080"
+      },
+      {
+        service = "http_status:404"
     }]
   }
 }

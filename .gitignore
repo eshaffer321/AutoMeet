@@ -10,6 +10,7 @@ terraform/secrets.tfvars
 **/tfplan
 **/terraform.tfstate.backup
 **/terraform.tfstate
+**/decrypted-variables.tf
 # Ignore Python cache
 __pycache__/
 *.pyc
