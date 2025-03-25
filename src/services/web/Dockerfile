@@ -10,4 +10,4 @@ COPY src /src
 ENV PYTHONPATH=/src
 ENV DYNACONF_SETTINGS=/src/config/settings.yaml  
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "4", "wsgi:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "4", "services.web.app.wsgi:app"]
