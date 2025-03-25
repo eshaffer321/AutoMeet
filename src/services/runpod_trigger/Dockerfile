@@ -2,7 +2,7 @@ FROM python:3.10-slim
 
 WORKDIR /src
 
-COPY src/services/watcher/requirements.txt .
+COPY src/services/runpod_trigger/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src /src
