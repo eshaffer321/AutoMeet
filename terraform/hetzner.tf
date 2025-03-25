@@ -3,7 +3,7 @@ resource "hcloud_server" "server" {
   server_type = "cpx21" # 3 vCPUs, 4GB RAM
   image       = "ubuntu-22.04"
   location    = "hil"
-  ssh_keys    = [hcloud_ssh_key.default.id]
+  ssh_keys    = [hcloud_ssh_key.default.id, hcloud_ssh_key.github_action.id]
 
   firewall_ids = [hcloud_firewall.default.id]
 
