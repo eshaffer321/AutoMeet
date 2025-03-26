@@ -1,4 +1,5 @@
 import os
+import uuid
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from config.config import settings
@@ -68,7 +69,9 @@ class JournalHandler(FileSystemEventHandler):
             self._write_file(FAILED_FILE, filename)
 
     def publish_message(self, filename, timestamp):
-        message = {"file": filename, "timestamp": timestamp}
+        # create a UUID for thie flow
+        unique_id = str(uuid.uuid4())
+        message = {"id": unique_id, "file": filename, "recording_ended_at": timestamp}
         redis_client.xadd(settings.redis.streams.journal_steam_name, message)
         logger.info(f"✅ Published event for: {filename}")
         self._write_file(PROCESSED_FILE, filename)

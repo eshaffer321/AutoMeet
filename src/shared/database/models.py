@@ -19,9 +19,10 @@ class Company(db.Entity):
     recordings = Set("Recording")
 
 class Recording(db.Entity):
-    filename = Required(str)
+    id = Required(str, unique=True)
     created_at = Required(datetime, default=datetime.now)
-    category = Required(Category)
-    subcategory = Required(Subcategory)
-    details = Required(str)
+    recording_ended_at = Required(datetime)
+    category = Optional(Category)
+    subcategory = Optional(Subcategory)
+    details = Optional(str)
     company = Optional(Company)  # Nullable - only needed for interviews

@@ -13,11 +13,15 @@ consumer = RedisStreamConsumer(
 
 def handler(data):
     s3_key = data['key']
-    job_id = runpod_client.run_async({'key': s3_key}) 
+    id = data['id']
+    recording_ended_at = data['recording_ended_at']
+    job_id = runpod_client.run_async({'key': s3_key, 'id': id, 'recording_ended_at': recording_ended_at}) 
     logger.info(f"Kicked off runpod job {job_id}")
     # Not being used now. For observability in the future
     consumer.client.xadd("runpod_jobs_fired", {
         "job_id": job_id,
+        "id": id,
+        "recording_ended_at": recording_ended_at,
         "s3_key": s3_key,
         "timestamp": datetime.now(timezone.utc).isoformat()
     })

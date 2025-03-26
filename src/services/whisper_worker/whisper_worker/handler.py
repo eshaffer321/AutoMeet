@@ -34,8 +34,7 @@ def upload_json_to_s3(base_key: str, suffix: str, data: dict):
     logger.info(f"Upload complete for {s3_path}")
     return s3_path
 
-def publish_message(raw_key, merged_key):
-    message = {"key_raw": raw_key, "merged_key": merged_key}
+def publish_message(message):
     logger.info(f"Publishing event to {TRANSCRIPTION_STREAM}. Message {message}")
     redis_client.xadd(TRANSCRIPTION_STREAM, message)
 
@@ -45,6 +44,8 @@ def handler(event):
     """
     try:
         s3_key = event["input"]["key"]
+        id = event["input"]["id"]
+        recording_ended_at = event["input"]["recording_ended_at"]
         download_audio(s3_key)
 
         raw_result, merged_result = AudioPipeline(INPUT_AUDIO_FILE).run_pipeline()
@@ -52,7 +53,10 @@ def handler(event):
         raw_s3_key, merged_s3_key = upload_json_to_s3(s3_key, "raw", raw_result), upload_json_to_s3(s3_key, "merged", merged_result)
 
         if IS_PUBLISH_ENABLED:
-            publish_message(raw_s3_key, merged_s3_key)
+            publish_message({"id": id,
+                            "key_raw": raw_s3_key,
+                            "merged_key":  merged_s3_key,
+                            recording_ended_at: recording_ended_at})
 
         return {"output": merged_result}
     except Exception as e:

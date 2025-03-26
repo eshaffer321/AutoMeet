@@ -47,8 +47,6 @@ services:
       dockerfile: src/services/runpod_trigger/Dockerfile
     env_file:
       - .env
-    ports:
-      - 8000:8000
     profiles:
       - prod
       - test
@@ -64,6 +62,17 @@ services:
     profiles:
       - prod
       - test
+
+  metadata_indexer:
+    build:
+      context: .
+      dockerfile: src/services/metadata_indexer/Dockerfile
+    env_file:
+      - .env
+    profiles:
+      - prod
+      - test
+
 
 volumes:
   redis_data:

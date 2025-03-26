@@ -27,8 +27,8 @@ def upload_file(filepath, timestamp):
     return s3_key
 
 
-def publish_message(s3_key):
-    message = {"key": s3_key}
+def publish_message(id, timestamp, s3_key):
+    message = {"id": id, "key": s3_key, "recording_ended_at": timestamp}
     steam_name = settings.redis.streams.audio_upload_complete_remote \
         if settings.uploader.run_mode == "runpod" \
         else settings.redis.streams.audio_upload_complete_local 
@@ -37,8 +37,8 @@ def publish_message(s3_key):
     consumer.client.xadd(steam_name, message)
 
 def handler(data):
-    s3_key = upload_file(data['file'], data['timestamp'])
-    publish_message(s3_key)
+    s3_key = upload_file(data['file'], data['recording_ended_at'])
+    publish_message(data['id'], data['recording_ended_at'], s3_key)
 
 def consume_stream():
     consumer.process(handler_fn=handler)
