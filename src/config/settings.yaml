@@ -36,6 +36,9 @@ uploader:
 
 runpod_trigger:
   consumer_group: runpod_trigger
+
+metadata_indexer:
+  consumer_group: metadata_indexer
   
 web:
 

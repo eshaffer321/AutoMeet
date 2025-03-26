@@ -1,11 +1,10 @@
-from shared.database.database import get_database
+from shared.database.bind import db 
 from pony.orm import db_session
 from shared.util.logging import logger
 
 @db_session
 def seed_database():
     """Seed initial production data into the database, only if empty."""
-    db = get_database()
 
     # Check if we already have data
     if db.Category.select().count() > 0:

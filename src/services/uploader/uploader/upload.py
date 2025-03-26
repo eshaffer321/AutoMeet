@@ -36,16 +36,9 @@ def publish_message(s3_key):
     logger.info(f"Signalling for processing of {s3_key} to {steam_name}")
     consumer.client.xadd(steam_name, message)
 
-def upload():
-    for entry_id, data in consumer.listen():
-        logger.info(f"Processing {data} for entry {entry_id}")
-        try:
-            s3_key = upload_file(data['file'], data['timestamp'])
-            publish_message(s3_key)
-            consumer.ack(entry_id)
-        except Exception as e:
-            logger.error(f"Failed to upload file {data['file']}: {str(e)}", exc_info=True)
+def handler(data):
+    s3_key = upload_file(data['file'], data['timestamp'])
+    publish_message(s3_key)
 
-if __name__ == "__main__":
-    upload()
-
+def consume_stream():
+    consumer.process(handler_fn=handler)

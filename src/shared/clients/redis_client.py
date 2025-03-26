@@ -3,13 +3,6 @@ import time
 from config.config import settings
 from shared.util.logging import logger 
 
-redis_client = redis.Redis(
-    host=settings.redis.host,
-    port=settings.redis.port,
-    decode_responses=True,
-    password=settings.redis.password,
-    ssl=True
-)
 
 def get_redis_client():
     """Helper to initialize a new Redis client."""
@@ -61,6 +54,16 @@ class RedisStreamConsumer:
                 logger.info("Reinitializing Redis client in 5 seconds...")
                 time.sleep(5)
                 self.client = get_redis_client()
+
+    def process(self, handler_fn):
+        """Process each message using the provided handler function."""
+        for entry_id, data in self.listen():
+            logger.info(f"🔄 Processing entry {entry_id} with data: {data}")
+            try:
+                handler_fn(data)
+                self.ack(entry_id)
+            except Exception as e:
+                logger.error(f"❌ Error handling entry {entry_id}: {e}", exc_info=True)
 
     def ack(self, message_id):
         """Acknowledge the processing of a message."""

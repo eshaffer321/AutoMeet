@@ -2,9 +2,10 @@ import os
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from config.config import settings
-from shared.clients.redis_client import redis_client
+from shared.clients.redis_client import get_redis_client
 from shared.util.logging import logger 
 
+redis_client = get_redis_client()
 DATA_DIR = os.path.expanduser(settings.watcher.data_dir)
 JOURNAL_FILE = os.path.join(DATA_DIR, "journal.txt")
 PROCESSED_FILE = os.path.join(DATA_DIR, "processed.txt")
