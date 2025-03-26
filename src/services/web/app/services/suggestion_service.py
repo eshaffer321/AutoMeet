@@ -1,5 +1,5 @@
 from pony.orm import db_session, select, count
-from shared.database.database import Category, Company, Subcategory
+from shared.database import Category, Company, Subcategory
 
 class SuggestionsService:
 
