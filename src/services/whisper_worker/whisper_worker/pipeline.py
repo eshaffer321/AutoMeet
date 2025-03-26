@@ -18,11 +18,12 @@ class AudioPipeline():
 
     def transcribe_with_whisper(self):
         logger.info("🎤 Loading Whisper model...")
-        model = whisperx.load_model(self.model_size, self.device, compute_type=self.compute_type, language=self.language)
 
         if self.model_dir:
             logger.info(f"📂 Using local model directory: {self.model_dir}")
             model = whisperx.load_model(self.model_size, self.device, compute_type=self.compute_type, download_root=self.model_dir, language=self.language)
+        else:
+            model = whisperx.load_model(self.model_size, self.device, compute_type=self.compute_type, language=self.language)
 
         logger.info("🎧 Loading audio file...")
         self.audio = whisperx.load_audio(self.audio_file)
@@ -47,31 +48,47 @@ class AudioPipeline():
         logger.info("🎭 Speaker identification complete!")
     
     def merge_segments(self):
+        """
+        Merges consecutive segments spoken by the same speaker.
+        Each merged segment includes combined text and start/end timestamps.
+        """
         logger.info("🧬 Merging segments...")
-        new_result = []
-        current_speaker, current_lines = None, []
-        
-        for segment in self.result['segments']:
-            if 'speaker' not in segment:
+
+        merged, buffer = [], []
+        speaker, start_ts, end_ts = None, None, None
+
+        def flush_buffer():
+            if buffer:
+                merged.append({
+                    'speaker': speaker,
+                    'text': " ".join(buffer),
+                    'start': start_ts,
+                    'end': end_ts
+                })
+
+        for seg in self.result['segments']:
+            seg_speaker = seg.get('speaker')
+            seg_text = seg.get('text', '').strip()
+            seg_start = seg.get('start')
+            seg_end = seg.get('end')
+
+            if not seg_speaker or not seg_text:
+                logger.info(f"⚠️ Skipping segment {seg}")
                 continue
-            if not segment['text']:
-                logger.info(f"Skipping {segment} due to empty text")
-                continue
-            next_speaker = segment['speaker']
-            
-            if next_speaker == current_speaker:
-                current_lines.append(segment['text'])
+
+            if seg_speaker == speaker:
+                buffer.append(seg_text)
+                end_ts = seg_end
             else:
-                new_result.append({'speaker': current_speaker, 'text': " ".join(current_lines)})
-                current_speaker = next_speaker
-                current_lines = [segment['text']]  
-        
-        # Add the last speaker's lines
-        if current_lines:
-            new_result.append({'speaker': current_speaker, 'text': " ".join(current_lines)})
-        
-        self.result = new_result
-        logger.info("✅ Segment Merging Complete!")
+                flush_buffer()
+                speaker = seg_speaker
+                buffer = [seg_text]
+                start_ts = seg_start
+                end_ts = seg_end
+
+        flush_buffer()
+        logger.info("✅ Segment merging complete.")
+        return merged
    
     def run_pipeline(self):
         """ Runs the entire pipeline in one method. """
@@ -79,7 +96,7 @@ class AudioPipeline():
         self.transcribe_with_whisper()
         self.align_output()
         self.assign_speaker_labels()
-        self.merge_segments()
+        merged_results = self.merge_segments()
         logger.info("✅ Audio pipeline complete!")
-        return self.result
+        return self.result, merged_results
 

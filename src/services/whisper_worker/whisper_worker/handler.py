@@ -7,55 +7,56 @@ from shared.s3_client import s3
 from shared.redis_client import get_redis_client 
 from services.whisper_worker.whisper_worker.pipeline import AudioPipeline
 
-model_dir = settings.whisper_worker.local_model_dir
-output_file = "audio.mp3"
-transcription_complete_stream = settings.redis.streams.transcription_complete
-is_publish_enabled = settings.whisper_worker.redis_enabled
+INPUT_AUDIO_FILE = "audio.mp3"
+TRANSCRIPTION_STREAM = settings.redis.streams.transcription_complete
+IS_PUBLISH_ENABLED = settings.whisper_worker.redis_enabled
 
 redis_client = get_redis_client()
+
+def download_audio(s3_key):
+    logger.info(f"⬇️ Downloading audio file from S3: {s3_key} to {INPUT_AUDIO_FILE}")
+    s3.download_file(settings.s3.bucket_name, s3_key, INPUT_AUDIO_FILE)
+    logger.info("✅ Audio download complete")
+
+def upload_json_to_s3(base_key: str, suffix: str, data: dict):
+    filename_without_ext = os.path.splitext(os.path.basename(base_key))[0]
+    namespace = os.path.dirname(base_key)
+    filename = f"{filename_without_ext}__{suffix}.json"
+    s3_path = f"{namespace}/{filename}"
+    logger.info(f"Uploading to {s3_path}")
+
+    data_json = json.dumps(data)
+    s3.put_object(
+        Bucket=settings.s3.bucket_name,
+        Key=s3_path,  
+        Body=data_json, 
+        ContentType='application/json' 
+    )
+    logger.info(f"Upload complete for {s3_path}")
+    return s3_path
+
+def publish_message(raw_key, merged_key):
+    message = {"key_raw": raw_key, "merged_key": merged_key}
+    logger.info(f"Publishing event to {TRANSCRIPTION_STREAM}. Message {message}")
+    redis_client.xadd(TRANSCRIPTION_STREAM, message)
+
 def handler(event):
     """
     Pulls audio file from s3, transcribes it with whisperx, and uploads result to s3
     """
     try:
         s3_key = event["input"]["key"]
-        # Download the audio file from the remote source
-        logger.info(f'Downloading {s3_key} from s3')
-        s3.download_file(settings.s3.bucket_name, s3_key, output_file)
-        logger.info(f"Finished downloading {s3_key} from s3")
+        download_audio(s3_key)
 
-        result = AudioPipeline(output_file).run_pipeline()
-        logger.info(result)
+        raw_result, merged_result = AudioPipeline(INPUT_AUDIO_FILE).run_pipeline()
 
-        filename_without_ext = os.path.splitext(os.path.basename(s3_key))[0]
-        namespace = os.path.dirname(s3_key)
+        raw_s3_key, merged_s3_key = upload_json_to_s3(s3_key, "raw", raw_result), upload_json_to_s3(s3_key, "merged", merged_result)
 
-        transcript_name = f"{filename_without_ext}.json"
+        if IS_PUBLISH_ENABLED:
+            publish_message(raw_s3_key, merged_s3_key)
 
-        result_json = json.dumps(result)
-        logger.info(f'Uploading {transcript_name}')
-        s3_path = f"{namespace}/{transcript_name}"
-        s3.put_object(
-            Bucket=settings.s3.bucket_name,
-            Key=s3_path,  
-            Body=result_json, 
-            ContentType='application/json' 
-        )
-
-        if is_publish_enabled:
-            logger.info(f"Signaling upload completion for {s3_path}")
-            publish_message(s3_path)
-        else:
-            logger.info(f"Skipping publishing because message publishing disabled")
-
-        return {"output": result_json}
+        return {"output": merged_result}
     except Exception as e:
-        error_message = traceback.format_exc()
-        logger.error(f"🔥 Full traceback:\n{error_message}") 
-        os._exit(1) 
+        logger.exception("🔥 Error during transcription pipeline")
         return {"error": str(e)}
-    
-def publish_message(transcription_s3_path):
-    message = {"key": transcription_s3_path}
-    redis_client.xadd(transcription_complete_stream, message)
-    logger.info(f"Publishing event to {transcription_complete_stream}. Message {message}")
+ 
