@@ -1,8 +1,7 @@
-import redis
-from shared.logging import logger
+from shared.util.logging import logger
 from config.config import settings
-from shared.redis_client import RedisStreamConsumer
-from shared.runpod_client import RunPodClient
+from shared.clients.redis_client import RedisStreamConsumer
+from shared.clients.runpod_client import RunPodClient
 from datetime import datetime, timezone
 
 def consume_stream():

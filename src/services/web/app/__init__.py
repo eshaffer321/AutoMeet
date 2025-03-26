@@ -1,12 +1,12 @@
 from flask import Flask
-from services.web.app.database import initialize_database
+from shared.database.database import initialize_database
 from config.config import settings
 
 def create_app():
     # Note: Adjust static_folder and template_folder paths if needed.
     app = Flask(__name__, static_folder='./static', template_folder='./templates')
 
-    initialize_database(provider='sqlite', filename=':memory:', create_db=True)
+    initialize_database()
 
     # Register the main blueprint
     from services.web.app.routes.main import bp as main_bp

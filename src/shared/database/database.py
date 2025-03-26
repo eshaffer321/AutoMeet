@@ -1,4 +1,4 @@
-from services.web.app.database.models import db
+from shared.database.models import db
 from config.config import settings
 
 def initialize_database():

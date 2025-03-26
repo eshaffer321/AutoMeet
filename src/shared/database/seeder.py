@@ -1,6 +1,6 @@
-from services.web.app.database.database import get_database
+from shared.database.database import get_database
 from pony.orm import db_session
-from shared.logging import logger
+from shared.util.logging import logger
 
 @db_session
 def seed_database():

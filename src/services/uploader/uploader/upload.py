@@ -1,9 +1,9 @@
 import os
 from datetime import datetime
 from config.config import settings
-from shared.redis_client import RedisStreamConsumer
-from shared.s3_client import s3
-from shared.logging import logger
+from shared.clients.redis_client import RedisStreamConsumer
+from shared.clients.s3_client import s3
+from shared.util.logging import logger
 
 
 consumer = RedisStreamConsumer(

@@ -1,10 +1,9 @@
 import os
-import traceback
 import json
 from config.config import settings
-from shared.logging import logger
-from shared.s3_client import s3
-from shared.redis_client import get_redis_client 
+from shared.util.logging import logger
+from shared.clients.s3_client import s3
+from shared.clients.redis_client import get_redis_client 
 from services.whisper_worker.whisper_worker.pipeline import AudioPipeline
 
 INPUT_AUDIO_FILE = "audio.mp3"

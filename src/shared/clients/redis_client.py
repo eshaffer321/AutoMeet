@@ -1,8 +1,7 @@
 import redis
 import time
 from config.config import settings
-from shared.logging import logger 
-from datetime import datetime 
+from shared.util.logging import logger 
 
 redis_client = redis.Redis(
     host=settings.redis.host,

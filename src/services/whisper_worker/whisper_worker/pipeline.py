@@ -1,6 +1,6 @@
 import whisperx
 from config.config import settings
-from shared.logging import logger
+from shared.util.logging import logger
 
 class AudioPipeline():
     def __init__(self, audio_file):

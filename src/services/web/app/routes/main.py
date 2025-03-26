@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 from services.web.app.services import RecordingService
 from services.web.app.services.suggestion_service import SuggestionsService
-from shared.logging import logger 
+from shared.util.logging import logger 
 
 bp = Blueprint('main', __name__)
 
