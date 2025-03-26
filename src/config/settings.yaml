@@ -7,6 +7,13 @@ redis:
     audio_upload_complete_remote: audio_upload_complete_remote
     transcription_complete: transcription_complete
 
+db: 
+  provider: postgres
+  host: db.miyxlnappsokgyfbqfem.supabase.co
+  port: 5432
+  user: postgres
+  database: postgres
+
 s3:
   url: https://s3.us-west-004.backblazeb2.com
   bucket-name: automeet-bucket
