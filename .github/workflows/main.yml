@@ -37,6 +37,8 @@ jobs:
             DYNACONF_runpod__api_key=${{ secrets.DYNACONF_RUNPOD__API_KEY }}
             DYNACONF_redis__password=${{ secrets.DYNACONF_REDIS__PASSWORD }}
             DYNACONF_db__password=${{ secrets.DYNACONF_DB__PASSWORD }}
+            DYNACONF_db__user=${{ secrets.DYNACONF_DB__USER }}
+            DYNACONF_db_host=${{ secrets.DYNACONF_DB__HOST }}
             EOF
 
             echo "[*] Deploying via Docker Compose..."
