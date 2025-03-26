@@ -6,7 +6,7 @@ from shared.database import Recording
 consumer = RedisStreamConsumer(
     stream_name=settings.redis.streams.transcription_complete,
     consumer_group=settings.metadata_indexer.consumer_group,
-    consumer="consumer_1"
+    consumer_name="consumer_1"
 )
 
 @db_session

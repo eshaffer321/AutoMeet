@@ -1,5 +1,5 @@
 from datetime import datetime
-from pony.orm import Required, Set, Optional, Database
+from pony.orm import Required, Set, Optional, Database, PrimaryKey
 
 db = Database() 
 
@@ -19,7 +19,9 @@ class Company(db.Entity):
     recordings = Set("Recording")
 
 class Recording(db.Entity):
-    id = Required(str, unique=True)
+    id = PrimaryKey(str)
+    s3_key_raw = Required(str)
+    s3_key_merged = Required(str)
     created_at = Required(datetime, default=datetime.now)
     recording_ended_at = Required(datetime)
     category = Optional(Category)

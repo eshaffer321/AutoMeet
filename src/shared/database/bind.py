@@ -12,7 +12,6 @@ def bind_and_generate():
         logger.info("Using sqlite ponyorm provider")
         db.bind(provider='sqlite', filename=':memory:', create_db=True)
     else:
-        logger.info("Using postgres ponyorm provider")
         db.bind(
             provider=db_config.provider,
             user=db_config.user,
