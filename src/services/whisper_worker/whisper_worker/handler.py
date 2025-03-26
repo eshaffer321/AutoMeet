@@ -11,7 +11,7 @@ from services.whisper_worker.whisper_worker.pipeline import AudioPipeline
 model_dir = settings.whisper_worker.local_model_dir
 output_file = "audio.mp3"
 transcription_complete_stream = settings.redis.streams.transcription_complete
-is_publish_enabled = os.environ.get("REDIS_ENALBED", False)
+is_publish_enabled = settings.whisper_worker.redis_enabled
 
 def handler(event):
     """

@@ -1,0 +1,28 @@
+name: Build & Push WhisperWorker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push WhisperWorker
+        run: |
+          docker build -t erickshaffer/automeet:whisper-worker-latest -f src/services/whisper_worker/Dockerfile .
+          docker push erickshaffer/automeet:whisper-worker-latest
