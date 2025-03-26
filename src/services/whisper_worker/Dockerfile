@@ -10,4 +10,4 @@ COPY src /src
 ENV PYTHONPATH=/src
 ENV DYNACONF_SETTINGS=/src/config/settings.yaml  
 
-CMD ["python", "-m", "services.whisper_worker.whisper_worker"]
+ENTRYPOINT ["python", "-m", "services.whisper_worker.whisper_worker"]

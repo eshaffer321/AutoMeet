@@ -1,11 +1,10 @@
 import os
 import traceback
-import runpod
 import json
 from config.config import settings
 from shared.logging import logger
 from shared.s3_client import s3
-from shared.redis_client import redis_client
+from shared.redis_client import get_redis_client 
 from services.whisper_worker.whisper_worker.pipeline import AudioPipeline
 
 model_dir = settings.whisper_worker.local_model_dir
@@ -13,6 +12,7 @@ output_file = "audio.mp3"
 transcription_complete_stream = settings.redis.streams.transcription_complete
 is_publish_enabled = settings.whisper_worker.redis_enabled
 
+redis_client = get_redis_client()
 def handler(event):
     """
     Pulls audio file from s3, transcribes it with whisperx, and uploads result to s3
