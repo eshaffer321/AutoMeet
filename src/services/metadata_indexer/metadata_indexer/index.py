@@ -1,3 +1,4 @@
+import datetime
 from shared.clients.redis_client import RedisStreamConsumer
 from config.config import settings
 from pony.orm import db_session
@@ -21,6 +22,10 @@ def handler(data):
         s3_key_merged=s3_key_merged,
         recording_ended_at=recording_ended_at
     )
+
+    if recording_ended_at.endswith("Z"):
+        recording_ended_at = datetime.fromisoformat(recording_ended_at.replace("Z", "+00:00"))
+
 
 def consume_stream():
     consumer.process(handler_fn=handler)
