@@ -1,45 +1,83 @@
-from pony.orm import db_session, select, count
-from shared.database import Category, Company, Subcategory
+from sqlalchemy.orm import Session
+from sqlalchemy import func
+from shared.database.client import SessionLocal
+from shared.database.models import Category, Company, Subcategory, Recording
 
 class SuggestionsService:
+    # Assuming these are defined somewhere in your class
+    _recording_types = []
+    _companies = []
+    _meeting_types = []
 
     @classmethod
-    @db_session
     def get_categories(cls):
-        """ Return the categories ranked by most frequenly used """
-        categories = [
-            {"id": c.id, "name": c.name, "recording_count": rec_count or 0}
-            for c, rec_count in select(
-                (c, count(c.recordings)) for c in Category
+        """
+        Return the categories ranked by most frequently used.
+        """
+        with SessionLocal() as session:
+            # Outer join to include categories with no recordings
+            results = (
+                session.query(
+                    Category.id,
+                    Category.name,
+                    func.count(Recording.id).label("recording_count")
+                )
+                .outerjoin(Recording, Category.id == Recording.category_id)
+                .group_by(Category.id)
+                .order_by(func.count(Recording.id).desc())
+                .all()
             )
-        ]
-        return [c for c in sorted(categories, key=lambda x: -x["recording_count"])]
+            # Build list of dicts from the query results
+            categories = [
+                {"id": row.id, "name": row.name, "recording_count": row.recording_count or 0}
+                for row in results
+            ]
+        return categories
 
     @classmethod
-    @db_session
     def get_companies(cls):
-        return [{"id": c.id, "name": c.name} for c in Company.select()] 
+        """
+        Return all companies.
+        """
+        with SessionLocal() as session:
+            companies = session.query(Company).all()
+            return [{"id": c.id, "name": c.name} for c in companies]
 
     @classmethod
-    @db_session
     def get_sub_categories(cls, category_name):
-        """ Return the subcategories ranked by most frequently used """
-        category = Category.get(name=category_name)  # Find the category
-        if not category:
-            return []  # Return empty if category not found
-        
-        subcategories = [
-            {"id": s.id, "name": s.name, "recording_count": rec_count or 0}
-            for s, rec_count in select(
-                (s, count(s.recordings)) for s in Subcategory if s.category == category
+        """
+        Return the subcategories for a given category, ranked by most frequently used.
+        """
+        with SessionLocal() as session:
+            # Find the category by name
+            category = session.query(Category).filter(Category.name == category_name).first()
+            if not category:
+                return []
+            
+            results = (
+                session.query(
+                    Subcategory.id,
+                    Subcategory.name,
+                    func.count(Recording.id).label("recording_count")
+                )
+                .outerjoin(Recording, Subcategory.id == Recording.subcategory_id)
+                .filter(Subcategory.category_id == category.id)
+                .group_by(Subcategory.id)
+                .order_by(func.count(Recording.id).desc())
+                .all()
             )
-        ]
-        return sorted(subcategories, key=lambda x: -x["recording_count"])
+            subcategories = [
+                {"id": row.id, "name": row.name, "recording_count": row.recording_count or 0}
+                for row in results
+            ]
+        return subcategories
 
     @classmethod
-    @db_session
     def add_suggestion(cls, category, value):
-        """Dynamically add new values to a category"""
+        """
+        Dynamically add new values to a suggestion category.
+        This method simply updates in-memory lists.
+        """
         if category == "recording-type" and value not in cls._recording_types:
             cls._recording_types.append(value)
         elif category == "company" and value not in cls._companies:

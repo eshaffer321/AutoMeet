@@ -1,30 +1,59 @@
 from datetime import datetime
-from pony.orm import Required, Set, Optional, Database, PrimaryKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
+from sqlalchemy.orm import relationship
+from shared.database.client import Base
 
-db = Database() 
+class Category(Base):
+    __tablename__ = "category"
 
-class Category(db.Entity):
-    name = Required(str, unique=True)
-    subcategories = Set("Subcategory")
-    recordings = Set("Recording")
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    name = Column(String, nullable=False, unique=True)
+    
+    # Relationships
+    subcategories = relationship("Subcategory", back_populates="category", cascade="all, delete")
+    recordings = relationship("Recording", back_populates="category")
 
-class Subcategory(db.Entity):
-    name = Required(str)
-    category = Required(Category)
-    recordings = Set("Recording")
 
-class Company(db.Entity):
+class Subcategory(Base):
+    __tablename__ = "subcategory"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    name = Column(String, nullable=False)
+    category_id = Column(Integer, ForeignKey("category.id", ondelete="CASCADE"))
+
+    # Relationships
+    category = relationship("Category", back_populates="subcategories")
+    recordings = relationship("Recording", back_populates="subcategory")
+
+
+class Company(Base):
     """Only used for interview recordings."""
-    name = Required(str, unique=True)
-    recordings = Set("Recording")
+    __tablename__ = "company"
 
-class Recording(db.Entity):
-    id = PrimaryKey(str)
-    s3_key_raw = Required(str)
-    s3_key_merged = Required(str)
-    created_at = Required(datetime, default=datetime.now)
-    recording_ended_at = Required(datetime)
-    category = Optional(Category)
-    subcategory = Optional(Subcategory)
-    details = Optional(str)
-    company = Optional(Company)  # Nullable - only needed for interviews
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    name = Column(String, nullable=False, unique=True)
+    
+    # Relationships
+    recordings = relationship("Recording", back_populates="company")
+
+
+class Recording(Base):
+    __tablename__ = "recording"
+
+    id = Column(String, primary_key=True, index=True)
+    s3_key_raw = Column(String, nullable=False)
+    s3_key_merged = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
+    recording_ended_at = Column(DateTime, nullable=False)
+    details = Column(Text, nullable=True)  # Optional details
+    status = Column(String, default="unprocessed", nullable=True)
+
+    # Foreign keys
+    category_id = Column(Integer, ForeignKey("category.id", ondelete="SET NULL"), nullable=True)
+    subcategory_id = Column(Integer, ForeignKey("subcategory.id", ondelete="SET NULL"), nullable=True)
+    company_id = Column(Integer, ForeignKey("company.id", ondelete="SET NULL"), nullable=True)
+
+    # Relationships
+    category = relationship("Category", back_populates="recordings")
+    subcategory = relationship("Subcategory", back_populates="recordings")
+    company = relationship("Company", back_populates="recordings")

@@ -1,4 +1,10 @@
-from shared.database.models import db, Category, Subcategory, Company, Recording
-from shared.database.bind import bind_and_generate
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+from config.config import settings
 
-bind_and_generate()
+# Create SQLAlchemy engine
+DATABASE_URL = settings.db.url 
+
+engine = create_engine(DATABASE_URL, echo=True)  # echo=True to log SQL
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()

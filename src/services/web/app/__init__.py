@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from config.config import settings
 
 def create_app():
@@ -12,6 +12,11 @@ def create_app():
     # Register the API blueprint with a URL prefix if desired
     from services.web.app.routes.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
+
+    @app.context_processor
+    def inject_request():
+        return dict(request=request)
+    
 
     return app
 

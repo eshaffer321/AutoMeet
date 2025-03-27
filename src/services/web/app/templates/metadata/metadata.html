@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Update Recording Metadata{% endblock %}
+{% block header %}Update Metadata{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('main.update_metadata', id=recording.id) }}" class="space-y-12 py-12">
+  <!-- Metadata & Speaker Info Section -->
+  <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
+    <div>
+      <h2 class="text-base/7 font-semibold text-gray-900">Metadata</h2>
+      <p class="mt-1 text-sm/6 text-gray-600">Enter details about this recording.</p>
+    </div>
+
+    <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+
+      <!-- Category Dropdown -->
+      <div class="sm:col-span-4">
+        <label for="category" class="block text-sm/6 font-medium text-gray-900">Recording Category</label>
+        <select id="category" name="category" class="border border-gray-300 mt-2 w-full rounded-md border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+          {% for option in categories %}
+            <option value="{{ option.name }}" {% if option.name == recording.category %}selected{% endif %}>
+              {{ option.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- New Category Input (Initially Hidden) -->
+    <div class="sm:col-span-4" id="new-category-container" style="display: none;">
+        <label for="new-category" class="block text-sm/6 font-medium text-gray-900">New Category</label>
+        <input type="text" name="new-category" id="new-category" placeholder="Enter new category" class="border border-gray-300 w-full rounded-md px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+    </div>
+
+      <!-- Subcategory Dropdown -->
+      <div class="sm:col-span-4">
+        <label for="sub-category" class="block text-sm/6 font-medium text-gray-900">Recording Subcategory</label>
+        <select id="sub-category" name="sub-category" class="border border-gray-300 mt-2 w-full rounded-md border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+          {% for option in subcategories %}
+            <option value="{{ option.name }}" {% if option.name == recording.subcategory %}selected{% endif %}>
+              {{ option.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- New Subcategory Input (Initially Hidden) -->
+    <div class="sm:col-span-4" id="new-subcategory-container" style="display: none;">
+        <label for="new-subcategory" class="block text-sm/6 font-medium text-gray-900">New Subcategory</label>
+        <input type="text" name="new-subcategory" id="new-subcategory" placeholder="Enter new subcategory" class="border border-gray-300 w-full rounded-md px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+    </div>
+
+      <!-- Company Input -->
+      <div class="col-span-full">
+        <label for="company" class="block text-sm/6 font-medium text-gray-900">Company <span class="text-gray-500">(Optional)</span></label>
+        <input type="text" name="company" id="company" value="{{ recording.company }}" placeholder="Company name" class="border border-gray-300 w-full rounded-md border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+      </div>
+
+      <!-- Speaker Assignment Section -->
+      <div class="col-span-full">
+        <h2 class="text-lg font-semibold text-gray-900">Speaker Assignment</h2>
+        <p class="text-sm text-gray-600">Assign names to each speaker.</p>
+        <div class="space-y-4 mt-4" id="speaker-inputs">
+          {% for speaker in speakers %}
+          <div class="flex items-center space-x-3">
+            <label for="{{ speaker }}" class="block text-sm font-medium text-gray-900">{{ speaker }}</label>
+            <input type="text" name="speaker_map[{{ speaker }}]" id="{{ speaker }}" placeholder="Enter name for {{ speaker }}" value="{{ speaker_map.get(speaker, '') }}" class="flex-1 rounded-md border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transcript Section (Scrollable) -->
+  <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
+    <div>
+      <h2 class="text-base/7 font-semibold text-gray-900">Transcript</h2>
+      <p class="mt-1 text-sm/6 text-gray-600">Review the transcript below.</p>
+    </div>
+
+    <!-- Scrollable Transcript -->
+    <div class="col-span-full md:col-span-2">
+      <div class="h-96 overflow-y-auto border border-gray-300 rounded-lg bg-white p-4 text-sm text-gray-700">
+        {% for line in transcript %}
+          <p><strong>{{ line.speaker }}:</strong> {{ line.text }}</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <div class="mt-6 flex items-center justify-end gap-x-6">
+    <a href="{{ url_for('main.unprocessed') }}" class="text-sm/6 font-semibold text-gray-900">Cancel</a>
+    <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/form-handler.js') }}"></script>
+{% endblock %}

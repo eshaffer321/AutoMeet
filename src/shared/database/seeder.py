@@ -1,5 +1,5 @@
 from shared.database.bind import db 
-from pony.orm import db_session
+from pony.orm import db_session, flush
 from shared.util.logging import logger
 
 @db_session
@@ -16,5 +16,6 @@ def seed_database():
     # Seed categories
     category1 = db.Category(name="Other")
     db.Subcategory(name="Other", category=category1)
+    flush()
 
     logger.info("✅ Seeding complete!")

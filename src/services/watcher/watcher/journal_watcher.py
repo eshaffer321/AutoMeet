@@ -106,11 +106,12 @@ def watch():
     ensure_required_files()
     observer = Observer()
     event_handler = JournalHandler()
+    logger.info("🔭 Checking for any missed entries since last startup")
     event_handler.process_new_entries()
     observer.schedule(event_handler, path=os.path.dirname(JOURNAL_FILE), recursive=False)
     observer.start()
     
-    logger.info("👀 Watcher started, monitoring journal for new entries...")
+    logger.info("👀 Continiously monitoring journal for new entries...")
 
     def handle_exit(signum, frame):
         """Handles termination signals for a clean exit."""

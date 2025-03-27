@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Unprocessed Recordings{% endblock %}
+{% block header %}Unprocessed Recordings{% endblock %}
+
+{% block content %}
+<div>
+    <!-- Table Info -->
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+          <h1 class="text-base font-semibold text-gray-900">Unprocessed recordings</h1>
+          <p class="mt-2 text-sm text-gray-700">A list of all the recordings that are missing metadata.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 flow-root overflow-hidden">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <!-- Table -->
+        <table class="w-full text-left">
+          <!-- Table Heading -->
+          <thead class="bg-white">
+            <tr>
+              <th scope="col" class="relative isolate py-3.5 pr-3 text-left text-sm font-semibold text-gray-900">
+                id
+                <div class="absolute inset-y-0 right-full -z-10 w-screen border-b border-b-gray-200"></div>
+                <div class="absolute inset-y-0 left-0 -z-10 w-screen border-b border-b-gray-200"></div>
+              </th>
+              <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">S3 Key</th>
+              <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 md:table-cell">Recording Ended</th>
+              <!-- <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Role</th> -->
+              <th scope="col" class="relative py-3.5 pl-3">
+                <span class="sr-only">Edit</span>
+              </th>
+            </tr>
+          </thead>
+
+          <!-- Table Body -->
+          <tbody>
+            {% for recording in recordings %}
+            <tr>
+              <td class="relative py-4 pr-3 text-sm font-medium text-gray-900">
+                {{ recording.id }}
+              </td>
+              <td class="hidden px-3 py-4 text-sm text-gray-500 md:table-cell">
+                {{ recording.s3_key.split('/')[-1] }}
+              </td>
+              <td class="px-3 py-4 text-sm text-gray-500">
+                {{ recording.recording_ended_at }}
+              </td>
+              <td class="relative py-4 pl-3 text-right text-sm font-medium">
+                <a href="{{ url_for('main.metadata', id=recording.id) }}" class="text-indigo-600 hover:text-indigo-900">Update</a>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="4" class="py-4 text-center text-gray-500">No unprocessed recordings found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+  
