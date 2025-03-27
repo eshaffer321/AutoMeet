@@ -106,6 +106,7 @@ def watch():
     ensure_required_files()
     observer = Observer()
     event_handler = JournalHandler()
+    event_handler.process_new_entries()
     observer.schedule(event_handler, path=os.path.dirname(JOURNAL_FILE), recursive=False)
     observer.start()
     

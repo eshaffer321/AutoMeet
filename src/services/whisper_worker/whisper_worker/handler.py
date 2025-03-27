@@ -56,7 +56,7 @@ def handler(event):
             publish_message({"id": id,
                             "key_raw": raw_s3_key,
                             "merged_key":  merged_s3_key,
-                            recording_ended_at: recording_ended_at})
+                            "recording_ended_at": recording_ended_at})
 
         return {"output": merged_result}
     except Exception as e:
