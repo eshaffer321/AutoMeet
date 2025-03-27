@@ -16,16 +16,13 @@ def handler(data):
     s3_key_merged = data["merged_key"]
     id = data["id"]
     recording_ended_at = data["recording_ended_at"]
+    recording_ended_at = datetime.fromisoformat(recording_ended_at.replace("Z", "+00:00"))
     Recording(
         id=id,
         s3_key_raw=s3_key_raw,
         s3_key_merged=s3_key_merged,
         recording_ended_at=recording_ended_at
     )
-
-    if recording_ended_at.endswith("Z"):
-        recording_ended_at = datetime.fromisoformat(recording_ended_at.replace("Z", "+00:00"))
-
 
 def consume_stream():
     consumer.process(handler_fn=handler)

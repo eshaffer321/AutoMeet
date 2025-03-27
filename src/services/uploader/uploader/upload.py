@@ -33,7 +33,7 @@ def publish_message(id, timestamp, s3_key):
         if settings.uploader.run_mode == "runpod" \
         else settings.redis.streams.audio_upload_complete_local 
 
-    logger.info(f"Signalling for processing of {s3_key} to {steam_name}")
+    logger.info(f"Signalling {message} to {steam_name}")
     consumer.client.xadd(steam_name, message)
 
 def handler(data):
