@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from shared.clients.redis_client import RedisStreamConsumer
 from config.config import settings
 from pony.orm import db_session
