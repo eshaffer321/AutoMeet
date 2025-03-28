@@ -1,5 +1,9 @@
+from re import sub
 from shared.database.client import SessionLocal
 from shared.database.models import Category, Subcategory, Company, Recording
+from sqlalchemy.orm import joinedload
+from .category_service import CategoryService
+from .company_service import CompanyService
 
 class RecordingService:
 
@@ -13,34 +17,16 @@ class RecordingService:
         try:
             # Determine the category name: prioritize new_category if provided
             cat_name = new_category or category
-            cat_instance = session.query(Category).filter(Category.name == cat_name).first()
-            if not cat_instance:
-                cat_instance = Category(name=cat_name)
-                session.add(cat_instance)
-                session.commit()  # Commit so that the category gets an ID
-                session.refresh(cat_instance)
+            cat_instance = CategoryService().get_or_create_category(session, cat_name) 
 
             # Determine the subcategory name: prioritize new_subcategory if provided
             subcat_name = new_subcategory or subcategory
-            subcat_instance = session.query(Subcategory).filter(Subcategory.name == subcat_name).first()
-            if not subcat_instance:
-                subcat_instance = Subcategory(name=subcat_name, category=cat_instance)
-                session.add(subcat_instance)
-                session.commit()  # Commit to assign an ID and persist the relation
-                session.refresh(subcat_instance)
+            subcat_instance = CategoryService().get_or_create_subcategory(session, subcat_name, cat_instance)
 
-            # Determine the company instance, if a company name is provided
             comp_instance = None
             if company:
-                comp_instance = session.query(Company).filter(Company.name == company).first()
-                if not comp_instance:
-                    comp_instance = Company(name=company)
-                    session.add(comp_instance)
-                    session.commit()  # Commit to persist the new company
-                    session.refresh(comp_instance)
-
-            # Create the Recording record.
-            # Here, we're mapping the passed filename to the s3_key_raw field.
+                comp_instance = CompanyService().get_or_create_company(session, company)
+            
             new_recording = Recording(
                 s3_key_raw=filename,
                 details="Temp details",
@@ -57,6 +43,28 @@ class RecordingService:
             session.close()
 
     @classmethod
+    def update_recording(cls,
+        id,
+        category=None,
+        new_category=None,
+        subcategory=None,
+        new_subcategory=None,
+        company=None,
+        speaker_map=None
+    ):
+        session = SessionLocal()
+
+        cat_name = new_category or category
+        category = CategoryService().get_or_create_category(session, cat_name)
+
+        subcat_name = new_subcategory or subcategory
+        subcategory = CategoryService().get_or_create_subcategory(session, subcat_name, category)
+
+        if company:
+            company = CompanyService().get_or_create_company(session, company)
+
+
+    @classmethod
     def get_unprocessed(cls):
         """
         Retrieve all recordings with a status of 'unprocessed'.
@@ -65,5 +73,21 @@ class RecordingService:
         try:
             unprocessed = session.query(Recording).filter(Recording.status == "unprocessed").all()
             return unprocessed
+        finally:
+            session.close()
+
+    @classmethod
+    def get_recording(cls, id) -> Recording:
+        session = SessionLocal()
+        try:
+            recording = (
+                session.query(Recording)
+                .options(joinedload(Recording.company))
+                .options(joinedload(Recording.category))
+                .options(joinedload(Recording.subcategory))
+                .filter(Recording.id == id)
+                .first()
+            )
+            return recording
         finally:
             session.close()

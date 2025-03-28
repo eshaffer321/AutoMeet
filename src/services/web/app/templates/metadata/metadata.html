@@ -1,9 +1,11 @@
+{% from "partials/_combobox.html" import combobox %}
 {% extends "base.html" %}
 {% block title %}Update Recording Metadata{% endblock %}
 {% block header %}Update Metadata{% endblock %}
 
 {% block content %}
-<form method="POST" action="{{ url_for('main.update_metadata', id=recording.id) }}" class="space-y-12 py-12">
+<form method="POST" action="{{ url_for('main.update_metadata_post', id=recording.id) }}" class="space-y-12">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" style="display: none;">
   <!-- Metadata & Speaker Info Section -->
   <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
     <div>
@@ -11,43 +13,17 @@
       <p class="mt-1 text-sm/6 text-gray-600">Enter details about this recording.</p>
     </div>
 
-    <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+    <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
 
       <!-- Category Dropdown -->
       <div class="sm:col-span-4">
-        <label for="category" class="block text-sm/6 font-medium text-gray-900">Recording Category</label>
-        <select id="category" name="category" class="border border-gray-300 mt-2 w-full rounded-md border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-          {% for option in categories %}
-            <option value="{{ option.name }}" {% if option.name == recording.category %}selected{% endif %}>
-              {{ option.name }}
-            </option>
-          {% endfor %}
-        </select>
+          {{ combobox('category', 'Category', categories, selected_id=recording.category_id, placeholder="Select or create a category...") }}
       </div>
-
-      <!-- New Category Input (Initially Hidden) -->
-    <div class="sm:col-span-4" id="new-category-container" style="display: none;">
-        <label for="new-category" class="block text-sm/6 font-medium text-gray-900">New Category</label>
-        <input type="text" name="new-category" id="new-category" placeholder="Enter new category" class="border border-gray-300 w-full rounded-md px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-    </div>
 
       <!-- Subcategory Dropdown -->
-      <div class="sm:col-span-4">
-        <label for="sub-category" class="block text-sm/6 font-medium text-gray-900">Recording Subcategory</label>
-        <select id="sub-category" name="sub-category" class="border border-gray-300 mt-2 w-full rounded-md border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-          {% for option in subcategories %}
-            <option value="{{ option.name }}" {% if option.name == recording.subcategory %}selected{% endif %}>
-              {{ option.name }}
-            </option>
-          {% endfor %}
-        </select>
+      <div id="sub-category-container" class="sm:col-span-4">
+        {{ combobox('sub-category', 'Subcategory', [], selected_id=None, placeholder="Select a subcategory...") }}
       </div>
-
-      <!-- New Subcategory Input (Initially Hidden) -->
-    <div class="sm:col-span-4" id="new-subcategory-container" style="display: none;">
-        <label for="new-subcategory" class="block text-sm/6 font-medium text-gray-900">New Subcategory</label>
-        <input type="text" name="new-subcategory" id="new-subcategory" placeholder="Enter new subcategory" class="border border-gray-300 w-full rounded-md px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-    </div>
 
       <!-- Company Input -->
       <div class="col-span-full">
@@ -62,8 +38,8 @@
         <div class="space-y-4 mt-4" id="speaker-inputs">
           {% for speaker in speakers %}
           <div class="flex items-center space-x-3">
-            <label for="{{ speaker }}" class="block text-sm font-medium text-gray-900">{{ speaker }}</label>
-            <input type="text" name="speaker_map[{{ speaker }}]" id="{{ speaker }}" placeholder="Enter name for {{ speaker }}" value="{{ speaker_map.get(speaker, '') }}" class="flex-1 rounded-md border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <label for="{{ speaker }}" class="block text-sm/6 font-medium text-gray-900">{{ speaker }}</label>
+            <input type="text" name="speaker_map[{{ speaker }}]" id="{{ speaker }}" placeholder="Enter name for {{ speaker }}" value="{{ speaker }}" class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
           </div>
           {% endfor %}
         </div>
@@ -75,16 +51,20 @@
   <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
     <div>
       <h2 class="text-base/7 font-semibold text-gray-900">Transcript</h2>
-      <p class="mt-1 text-sm/6 text-gray-600">Review the transcript below.</p>
+      <p class="mt-1 text-sm/6 text-gray-600">Make any edits to the transcription.</p>
     </div>
 
     <!-- Scrollable Transcript -->
     <div class="col-span-full md:col-span-2">
-      <div class="h-96 overflow-y-auto border border-gray-300 rounded-lg bg-white p-4 text-sm text-gray-700">
-        {% for line in transcript %}
-          <p><strong>{{ line.speaker }}:</strong> {{ line.text }}</p>
-        {% endfor %}
+
+      <div>
+        <!-- Editable version -->
+        <label for="edit" class="block text-sm/6 font-medium text-gray-900">Edit Transcript</label>
+        <div class="mt-2">
+          <textarea rows="14" name="updated-transcription" id="updated-transcription" class="border border-gray-300 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">{{ transcription }}</textarea>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -97,5 +77,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/form-handler.js') }}"></script>
+<script src="{{ url_for('static', filename='js/form-handler2.js') }}"></script>
+
 {% endblock %}

@@ -43,13 +43,13 @@
                 {{ recording.id }}
               </td>
               <td class="hidden px-3 py-4 text-sm text-gray-500 md:table-cell">
-                {{ recording.s3_key.split('/')[-1] }}
+                {{ recording.s3_key_merged.split('/')[-1] }}
               </td>
               <td class="px-3 py-4 text-sm text-gray-500">
                 {{ recording.recording_ended_at }}
               </td>
               <td class="relative py-4 pl-3 text-right text-sm font-medium">
-                <a href="{{ url_for('main.metadata', id=recording.id) }}" class="text-indigo-600 hover:text-indigo-900">Update</a>
+                <a href="{{ url_for('main.update_metadata', id=recording.id) }}" class="text-indigo-600 hover:text-indigo-900">Update</a>
               </td>
             </tr>
             {% else %}

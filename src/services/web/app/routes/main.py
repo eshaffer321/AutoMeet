@@ -1,15 +1,10 @@
-from flask import Blueprint, app, render_template, request
-from services.web.app.services import RecordingService
-from services.web.app.services.suggestion_service import SuggestionsService
+import json
+from flask import Blueprint, render_template, request
+from services.web.app.services import RecordingService, TranscriptionService, SuggestionsService
 from shared.util.logging import logger 
 
 bp = Blueprint('main', __name__)
 
-
-
-recordings_data = [
-    {"id": "6d8516cf-6bcc-437a-a1d0-95d876111c13", "s3_key": "audio/2025/03/27/1646_20250327 1046 Recording__merged.json", "recording_ended_at": "2025-03-27T16:46:50.061Z"}
-]
 
 ####################
 # Unprocessed Routes
@@ -24,44 +19,57 @@ def unprocessed():
 #################
 @bp.route("/metadata/<id>", methods=["GET"])
 def update_metadata(id):
-    # Fetch recording based on ID – for now, mock it
-    recording = next((rec for rec in recordings_data if rec["id"] == id), None)
+    recording = RecordingService.get_recording(id)
     if not recording:
         return "Recording not found", 404
 
-    # Get categories from SuggestionsService
-    categories = SuggestionsService.get_categories()
+    transcription = TranscriptionService().get_transcription(recording.s3_key_merged)
+    speakers = list(set(entry['speaker'] for entry in transcription))
 
-    # Render metadata form
+    categories = SuggestionsService.get_categories()
+    transcription_formatted = json.dumps(transcription, indent=2)
+
     return render_template(
         "metadata/metadata.html",
         recording=recording,
-        categories=categories
+        speakers=speakers,
+        categories=categories,
+        transcription=transcription_formatted,
     )
 
 @bp.route("/update_metadata/<id>", methods=["POST"])
-def index_post():
+def update_metadata_post(id):
     try:
+        recording = RecordingService.get_recording(id)
+        if not recording:
+            return "Recording not found", 404
+
         form = request.form
         category = form.get("category", "").strip()
         new_category = form.get("new-category", "").strip()
         sub_category = form.get("sub-category", "").strip()
         new_sub_category = form.get("new-subcategory", "").strip()
         company = form.get("company", "").strip()
+        updated_transcription = form.get("updated_transcription", "").strip()
+        speaker_map = request.form.to_dict(flat=False).get('speaker_map', {})
 
-        # Replace this with your actual file path logic if needed.
-        dummy_file_path = "/tmp/fake_interview.wav"
+        TranscriptionService().update_transcription(
+            filename=recording.s3_key_merged,
+            transcription=updated_transcription,
+            speaker_map=speaker_map
+        )
 
-        RecordingService.create(
-            dummy_file_path,
+        RecordingService.update_recording(
+            id,
             category=category,
             new_category=new_category,
             subcategory=sub_category,
             new_subcategory=new_sub_category,
-            company=company
+            company=company,
+            speaker_map=speaker_map
         )
 
-        return render_template('success.html', new_path=dummy_file_path)
+        return render_template('metadata/success.html', new_path=None)
 
     except Exception as e:
         logger.error(f"Error processing file: {str(e)}", exc_info=True)
