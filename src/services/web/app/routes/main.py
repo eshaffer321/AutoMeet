@@ -20,6 +20,10 @@ def unprocessed():
 @bp.route("/metadata/<id>", methods=["GET"])
 def update_metadata(id):
     recording = RecordingService.get_recording(id)
+    subcategories = []
+    if recording.subcategory:
+        subcategories = SuggestionsService().get_sub_categories(recording.subcategory.name) 
+
     if not recording:
         return "Recording not found", 404
 
@@ -34,6 +38,7 @@ def update_metadata(id):
         recording=recording,
         speakers=speakers,
         categories=categories,
+        subcategories=subcategories,
         transcription=transcription_formatted,
     )
 
@@ -45,12 +50,13 @@ def update_metadata_post(id):
             return "Recording not found", 404
 
         form = request.form
-        category = form.get("category", "").strip()
-        new_category = form.get("new-category", "").strip()
-        sub_category = form.get("sub-category", "").strip()
-        new_sub_category = form.get("new-subcategory", "").strip()
+        print(form)
+        category_id = form.get("category_id", "").strip()
+        category_name = form.get("category_name", "").strip()
+        subcategory_id = form.get("sub-category_id", "").strip()
+        subcategory_name = form.get("sub-category_name", "").strip()
         company = form.get("company", "").strip()
-        updated_transcription = form.get("updated_transcription", "").strip()
+        updated_transcription = form.get("updated-transcription", "").strip()
         speaker_map = request.form.to_dict(flat=False).get('speaker_map', {})
 
         TranscriptionService().update_transcription(
@@ -61,10 +67,10 @@ def update_metadata_post(id):
 
         RecordingService.update_recording(
             id,
-            category=category,
-            new_category=new_category,
-            subcategory=sub_category,
-            new_subcategory=new_sub_category,
+            category_id=category_id,
+            category_name=category_name,
+            subcategory_id=subcategory_id,
+            subcategory_name=subcategory_name,
             company=company,
             speaker_map=speaker_map
         )

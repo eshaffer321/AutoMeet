@@ -78,7 +78,6 @@ function initComboBox(fieldName) {
     });
 }
 
-// Add Active Styles to the Selected Option
 function updateActiveOption(fieldName, selectedId) {
     const comboBoxOptions = document.querySelector(`#${fieldName}-options`);
     const allOptions = Array.from(comboBoxOptions.querySelectorAll("li"));
@@ -88,13 +87,13 @@ function updateActiveOption(fieldName, selectedId) {
       option.classList.remove("bg-indigo-600", "text-white", "font-semibold");
       const checkIcon = option.querySelector(".check-icon");
       if (checkIcon) {
-        checkIcon.classList.add("hidden"); // Hide using Tailwind class
+        checkIcon.classList.add("hidden");
       }
     });
   
-    // Find and style the selected option
+    // Convert selectedId to string for proper comparison
     const selectedOption = allOptions.find(
-      (option) => option.dataset.id === selectedId
+      (option) => option.dataset.id === String(selectedId)
     );
   
     if (selectedOption) {
@@ -103,7 +102,6 @@ function updateActiveOption(fieldName, selectedId) {
       // Show checkmark if available
       let checkIcon = selectedOption.querySelector(".check-icon");
       if (!checkIcon) {
-        // Only create if the checkmark doesn't exist
         checkIcon = document.createElement("span");
         checkIcon.className =
           "check-icon absolute inset-y-0 left-0 flex items-center pl-1.5 text-white";
@@ -115,12 +113,12 @@ function updateActiveOption(fieldName, selectedId) {
         selectedOption.prepend(checkIcon);
       }
   
-      // Show the checkmark by removing the hidden class
+      // Ensure the checkmark is visible
       if (checkIcon) {
         checkIcon.classList.remove("hidden");
       }
     }
-  }
+}
 
 // Track the last selected category to compare changes
 let previousCategory = "";
@@ -177,21 +175,22 @@ function resetSubcategory() {
 function selectOption(fieldName, id, name) {
     const input = document.querySelector(`#${fieldName}`);
     const hiddenInput = document.querySelector(`#${fieldName}_id`);
-
+  
     input.value = name;
     hiddenInput.value = id;
-
-    // Hide the dropdown
+  
+    // Hide the dropdown after selecting
     document.querySelector(`#${fieldName}-options`).style.display = "none";
-
+  
+    // Update active option with the checkmark and styles
     updateActiveOption(fieldName, id);
-
+  
+    // Handle category-specific changes
     if (fieldName === "category") {
-        handleCategoryChange();
+      handleCategoryChange(); // Update subcategories on category change
     }
-}
+  }
 
-// Fetch and Update Subcategories
 function updateSubcategories(categoryName) {
     const subCategoryContainer = document.querySelector("#sub-category-container");
     const subCategoryOptions = document.querySelector("#sub-category-options");
@@ -216,10 +215,7 @@ function updateSubcategories(categoryName) {
       })
       .then((data) => {
         if (data.length === 0) {
-          // No subcategories found, but still show an empty dropdown
-          console.log("No subcategories found. Showing empty input.");
-  
-          // Show an empty subcategory dropdown ready for new entry
+          // Show empty subcategory for manual entry
           subCategoryContainer.style.display = "block";
           subCategoryOptions.innerHTML = `
             <li
@@ -231,10 +227,9 @@ function updateSubcategories(categoryName) {
             </li>
           `;
   
-          // Enable input so user can type a new subcategory
           subCategoryInput.value = "";
           subCategoryHiddenInput.value = "";
-          subCategoryOptions.style.display = "none"; // Hide dropdown until user types
+          subCategoryOptions.style.display = "none";
         } else {
           // Add new options dynamically
           data.forEach((sub) => {
@@ -254,13 +249,12 @@ function updateSubcategories(categoryName) {
           // Show the sub-category container
           subCategoryContainer.style.display = "block";
   
-          // Re-initialize the subcategory combo box
+          // Reinitialize the subcategory combo box after updating options
           initComboBox("sub-category");
         }
       })
       .catch((error) => {
         console.error("Error fetching subcategories:", error);
-        // In case of error, show an empty dropdown for manual entry
         subCategoryContainer.style.display = "block";
         subCategoryOptions.innerHTML = `
           <li
@@ -272,7 +266,7 @@ function updateSubcategories(categoryName) {
           </li>
         `;
       });
-}
+  }
   
   // Call initComboBox for All Combo Boxes
 document.addEventListener("DOMContentLoaded", () => {

@@ -6,7 +6,8 @@
 {% block content %}
 <form method="POST" action="{{ url_for('main.update_metadata_post', id=recording.id) }}" class="space-y-12">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" style="display: none;">
-  <!-- Metadata & Speaker Info Section -->
+  
+  <!-- Metadata Section -->
   <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
     <div>
       <h2 class="text-base/7 font-semibold text-gray-900">Metadata</h2>
@@ -14,36 +15,38 @@
     </div>
 
     <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
-
       <!-- Category Dropdown -->
       <div class="sm:col-span-4">
-          {{ combobox('category', 'Category', categories, selected_id=recording.category_id, placeholder="Select or create a category...") }}
+        {{ combobox('category', 'Category', categories, selected_id=recording.category_id, placeholder="Select or create a category...") }}
       </div>
 
       <!-- Subcategory Dropdown -->
       <div id="sub-category-container" class="sm:col-span-4">
-        {{ combobox('sub-category', 'Subcategory', [], selected_id=None, placeholder="Select a subcategory...") }}
+        {{ combobox('sub-category', 'Subcategory', subcategories, selected_id=recording.subcategory_id, placeholder="Select a subcategory...") }}
       </div>
 
       <!-- Company Input -->
       <div class="col-span-full">
-        <label for="company" class="block text-sm/6 font-medium text-gray-900">Company <span class="text-gray-500">(Optional)</span></label>
-        <input type="text" name="company" id="company" value="{{ recording.company }}" placeholder="Company name" class="border border-gray-300 w-full rounded-md border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-      </div>
+        <label for="company" class="block text-sm/6 font-medium text-gray-900">
+          Company <span class="text-gray-500">(Optional)</span>
+        </label>
+        <input type="text" name="company" id="company" value="{{ recording.company.name|default('', true) }}" placeholder="Company name" class="border border-gray-300 w-full rounded-md px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">      </div>
+    </div>
+  </div>
 
-      <!-- Speaker Assignment Section -->
-      <div class="col-span-full">
-        <h2 class="text-lg font-semibold text-gray-900">Speaker Assignment</h2>
-        <p class="text-sm text-gray-600">Assign names to each speaker.</p>
-        <div class="space-y-4 mt-4" id="speaker-inputs">
-          {% for speaker in speakers %}
-          <div class="flex items-center space-x-3">
-            <label for="{{ speaker }}" class="block text-sm/6 font-medium text-gray-900">{{ speaker }}</label>
-            <input type="text" name="speaker_map[{{ speaker }}]" id="{{ speaker }}" placeholder="Enter name for {{ speaker }}" value="{{ speaker }}" class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-          </div>
-          {% endfor %}
-        </div>
+  <!-- Speaker Assignment Section -->
+  <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
+    <div>
+      <h2 class="text-base/7 font-semibold text-gray-900">Speaker Assignment</h2>
+      <p class="mt-1 text-sm/6 text-gray-600">Assign names to each speaker.</p>
+    </div>
+    <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 md:col-span-2">
+      {% for speaker in speakers %}
+      <div class="sm:col-span-6">
+        <label for="{{ speaker }}" class="block text-sm/6 font-medium text-gray-900">{{ speaker }}</label>
+        <input type="text" name="speaker_map[{{ speaker }}]" id="{{ speaker }}" placeholder="Enter name for {{ speaker }}" value="{{ speaker }}" class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
       </div>
+      {% endfor %}
     </div>
   </div>
 
@@ -56,15 +59,12 @@
 
     <!-- Scrollable Transcript -->
     <div class="col-span-full md:col-span-2">
-
       <div>
-        <!-- Editable version -->
         <label for="edit" class="block text-sm/6 font-medium text-gray-900">Edit Transcript</label>
         <div class="mt-2">
           <textarea rows="14" name="updated-transcription" id="updated-transcription" class="border border-gray-300 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">{{ transcription }}</textarea>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -77,6 +77,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/form-handler2.js') }}"></script>
-
+<script src="{{ url_for('static', filename='js/metadata-form-handler.js') }}"></script>
 {% endblock %}

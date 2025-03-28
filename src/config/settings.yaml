@@ -49,7 +49,7 @@ whisper_worker:
 
   whisper_model:
     language: "en"
-    model_size: "large-v3-turbo"
+    model_size: "large-v2"
     compute_type: "int8"
     device: "cpu"
     batch_size: 16

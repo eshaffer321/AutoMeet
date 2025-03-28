@@ -16,8 +16,7 @@
       aria-controls="{{ field_name }}-options"
       aria-expanded="false"
       placeholder="{{ placeholder }}"
-      value=""
-    />
+      value="{{ selected_id and options | selectattr('id', 'equalto', selected_id) | map(attribute='name') | first | default('', true) }}"    />
     <input type="hidden" id="{{ field_name }}_id" name="{{ field_name }}_id" value="{{ selected_id or '' }}" />
 
     

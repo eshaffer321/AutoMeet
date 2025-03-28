@@ -36,8 +36,9 @@ class TranscriptionService:
                 for entry in cleaned_json:
                     if entry['speaker'] in speaker_map:
                         entry['speaker'] = speaker_map[entry['speaker']]
-
-            s3.put_object(Bucket=self.bucket, Key=filename, Body=cleaned_json)
+            serialized_data = json.dumps(cleaned_json).encode('utf-8')
+            s3.put_object(Bucket=self.bucket, Key=filename, Body=serialized_data)
         except Exception as e:
             logger.error(f"Error updating transcription for {filename}: {e}")
+            logger.error(f"Transcription data: {transcription}")
             raise e

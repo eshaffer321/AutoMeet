@@ -1,16 +1,17 @@
 import redis
 import time
 from config.config import settings
-from shared.util.logging import logger 
-
+from shared.util.logging import logger
+from redis.exceptions import ConnectionError as RedisConnectionError
+from redis.exceptions import ResponseError as RedisResponseError
 
 def get_redis_client():
     """Helper to initialize a new Redis client."""
     return redis.Redis(
-        host=settings.redis.host,
-        port=settings.redis.port,
+        host=settings.redis.host, # type: ignore
+        port=settings.redis.port, # type: ignore
         decode_responses=True,
-        password=settings.redis.password,
+        password=settings.redis.password, # type: ignore
         ssl=True
     )
 
@@ -26,7 +27,7 @@ class RedisStreamConsumer:
         # Ensure the consumer group exists
         try:
             self.client.xgroup_create(self.stream_name, self.consumer_group, id='$', mkstream=True)
-        except redis.exceptions.ResponseError:
+        except RedisResponseError:
             # Likely means the group already exists
             pass
 
@@ -49,7 +50,7 @@ class RedisStreamConsumer:
                     for stream, entries in messages:
                         for entry_id, data in entries:
                             yield entry_id, data
-            except ConnectionError as e:
+            except RedisConnectionError as e:
                 logger.error(f"Redis connection lost: {e}")
                 logger.info("Reinitializing Redis client in 5 seconds...")
                 time.sleep(5)

@@ -4,16 +4,16 @@ from shared.util.logging import logger
 
 class AudioPipeline():
     def __init__(self, audio_file):
-        model_config = settings.whisper_worker.whisper_model
-        self.batch_size = model_config.batch_size 
-        self.compute_type = model_config.compute_type 
-        self.device = model_config.device 
-        self.model_dir = settings.whisper_worker.local_model_dir 
-        self.model_size = model_config.model_size 
+        model_config = settings.whisper_worker.whisper_model # type: ignore
+        self.batch_size = model_config.batch_size # type: ignore 
+        self.compute_type = model_config.compute_type # type: ignore 
+        self.device = model_config.device # type: ignore 
+        self.model_dir = settings.whisper_worker.local_model_dir # type: ignore 
+        self.model_size = model_config.model_size # type: ignore 
         self.result = None
         self.audio_file = audio_file
-        self._hf_token = settings.whisper_worker.hf_token 
-        self.language = model_config.language
+        self._hf_token = settings.whisper_worker.hf_token # type: ignore 
+        self.language = model_config.language  # type: ignore
         logger.info(f"🚀 Initialized AudioPipeline with device: {self.device}, model: {self.model_size}, compute type: {self.compute_type}, batch size: {self.batch_size}")
 
     def transcribe_with_whisper(self):
@@ -41,8 +41,7 @@ class AudioPipeline():
     def assign_speaker_labels(self):
         logger.info("🗣️ Assigning speaker labels...")
         diarize_model = whisperx.DiarizationPipeline(use_auth_token=self._hf_token, device=self.device)
-
-        diarize_segments = diarize_model(self.audio)
+        diarize_segments = diarize_model(self.audio, min_speakers=2, max_speakers=10)
 
         self.result = whisperx.assign_word_speakers(diarize_segments, self.result)
         logger.info("🎭 Speaker identification complete!")
@@ -98,5 +97,6 @@ class AudioPipeline():
         self.assign_speaker_labels()
         merged_results = self.merge_segments()
         logger.info("✅ Audio pipeline complete!")
+        print(merged_results)
         return self.result, merged_results
 
