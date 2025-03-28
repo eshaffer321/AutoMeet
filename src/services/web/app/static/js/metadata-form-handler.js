@@ -22,37 +22,32 @@ function initComboBox(fieldName) {
     input.addEventListener("focus", () => {
       comboBoxOptions.style.display = "block";
     });
-
-    // Handle blur event to check for new entries in the category
-    if (fieldName === "category") {
-        input.addEventListener("blur", (e) => {
-        const typedCategory = e.target.value.trim();
-        if (typedCategory !== "") {
-            updateSubcategories(typedCategory);
-        }
-        });
-    }
  
     // filter options based on input
     input.addEventListener("input", (e) => {
-        const inputValue = e.target.value.toLowerCase();
-        const allOptions = Array.from(comboBoxOptions.querySelectorAll("li"));
+      const inputValue = e.target.value.toLowerCase();
+      const allOptions = Array.from(comboBoxOptions.querySelectorAll("li"));
+      let hasMatch = false;
       
-        let hasMatch = false;
-        allOptions.forEach((option) => {
+      allOptions.forEach((option) => {
           const optionName = option.dataset.name.toLowerCase();
           if (optionName.includes(inputValue)) {
-            option.style.display = "block";
-            hasMatch = true;
+              option.style.display = "block";
+              if (optionName === inputValue) {
+                  hasMatch = true;
+              }
           } else {
-            option.style.display = "none";
+              option.style.display = "none";
           }
-        });
+      });
+  
+      // Clear hidden input if there's no exact match
+      if (!hasMatch) {
+          hiddenInput.value = "";
+      }
       
-        // Show/Hide Dropdown Based on Matches
-        comboBoxOptions.style.display = hasMatch ? "block" : "none";
-      
-    });
+      comboBoxOptions.style.display = hasMatch ? "block" : "none";
+  });
   
     // Handle Click on Option
     comboBoxOptions.addEventListener("click", (e) => {

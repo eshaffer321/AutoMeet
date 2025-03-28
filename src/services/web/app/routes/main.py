@@ -50,14 +50,19 @@ def update_metadata_post(id):
             return "Recording not found", 404
 
         form = request.form
-        print(form)
         category_id = form.get("category_id", "").strip()
         category_name = form.get("category_name", "").strip()
         subcategory_id = form.get("sub-category_id", "").strip()
         subcategory_name = form.get("sub-category_name", "").strip()
         company = form.get("company", "").strip()
         updated_transcription = form.get("updated-transcription", "").strip()
-        speaker_map = request.form.to_dict(flat=False).get('speaker_map', {})
+
+        speaker_map = {}
+        for key, value in request.form.items():
+            if key.startswith("speaker_map[") and key.endswith("]"):
+                speaker = key[len("speaker_map["):-1]
+                speaker_map[speaker] = value
+
 
         TranscriptionService().update_transcription(
             filename=recording.s3_key_merged,

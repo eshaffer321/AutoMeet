@@ -32,6 +32,7 @@ class TranscriptionService:
             cleaned_json = json.loads(transcription)
 
             if speaker_map:
+                print(speaker_map)
                 # Apply the speaker mapping to the transcription
                 for entry in cleaned_json:
                     if entry['speaker'] in speaker_map:
