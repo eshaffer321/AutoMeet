@@ -47,6 +47,7 @@ class Recording(Base):
     recording_ended_at = Column(DateTime, nullable=False)
     details = Column(Text, nullable=True)  # Optional details
     status = Column(String, default="unprocessed", nullable=True)
+    duration = Column(Integer, nullable=True)  # Duration in seconds
 
     # Foreign keys
     category_id = Column(Integer, ForeignKey("category.id", ondelete="SET NULL"), nullable=True)

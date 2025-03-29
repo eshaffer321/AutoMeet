@@ -1,3 +1,4 @@
+from math import log
 import whisperx
 from config.config import settings
 from shared.util.logging import logger
@@ -88,6 +89,27 @@ class AudioPipeline():
         flush_buffer()
         logger.info("✅ Segment merging complete.")
         return merged
+    
+    def calculate_duration(self):
+        """ Calculates the total duration of the audio file. """
+        start_timestamp = self.result['segments'][0]['start']
+        end_timestamp = self.result['segments'][-1]['end']
+        duration = end_timestamp - start_timestamp
+        logger.info(f"⏱️ Total duration: {duration} seconds")
+        return duration
+    
+    def add_metadata(self, merged_result):
+        """ Adds metadata to the result. """
+        logger.info("📝 Adding metadata to the result...")
+        duration = self.calculate_duration()
+        merged_result['duration'] = duration
+        self.result['duration'] = duration
+        self.result['language'] = self.language
+        self.result['model_size'] = self.model_size
+        self.result['batch_size'] = self.batch_size
+        self.result['compute_type'] = self.compute_type
+        self.result['device'] = self.device
+
    
     def run_pipeline(self):
         """ Runs the entire pipeline in one method. """
@@ -96,7 +118,7 @@ class AudioPipeline():
         self.align_output()
         self.assign_speaker_labels()
         merged_results = self.merge_segments()
+        self.add_metadata(merged_results)
         logger.info("✅ Audio pipeline complete!")
-        print(merged_results)
         return self.result, merged_results
 

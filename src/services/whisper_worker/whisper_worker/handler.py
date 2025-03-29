@@ -50,13 +50,15 @@ def handler(event):
 
         raw_result, merged_result = AudioPipeline(INPUT_AUDIO_FILE).run_pipeline()
 
-        raw_s3_key, merged_s3_key = upload_json_to_s3(s3_key, "raw", raw_result), upload_json_to_s3(s3_key, "merged", merged_result)
+        raw_s3_key = upload_json_to_s3(s3_key, "raw", raw_result)
+        merged_s3_key = upload_json_to_s3(s3_key, "merged", merged_result)
 
         if IS_PUBLISH_ENABLED:
             publish_message({"id": id,
                             "key_raw": raw_s3_key,
                             "merged_key":  merged_s3_key,
-                            "recording_ended_at": recording_ended_at})
+                            "recording_ended_at": recording_ended_at,
+                            "duration": raw_result["duration"]})
 
         return {"output": merged_result}
     except Exception as e:

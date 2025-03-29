@@ -16,6 +16,7 @@ def handler(data):
     s3_key_raw = data["key_raw"]
     s3_key_merged = data["merged_key"]
     recording_id = data["id"]
+    duration = data["duration"]
     # Convert the ISO formatted string to a datetime object
     recording_ended_at = datetime.fromisoformat(data["recording_ended_at"].replace("Z", "+00:00"))
     
@@ -26,7 +27,8 @@ def handler(data):
             id=recording_id,
             s3_key_raw=s3_key_raw,
             s3_key_merged=s3_key_merged,
-            recording_ended_at=recording_ended_at
+            recording_ended_at=recording_ended_at,
+            duration=duration
         )
         # Add and commit the new instance to the database
         session.add(new_recording)
