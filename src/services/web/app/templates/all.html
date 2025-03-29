@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block title %}All Recordings{% endblock %}
+{% block header %}All Recordings{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+  <!-- Filter Section -->
+  <div class="mb-12">
+    <label id="filter-label" class="block text-sm font-medium text-gray-900">Filter by status</label>
+    <div class="relative mt-2">
+        <button id="dropdown-button" type="button" class="border grid w-full cursor-default grid-cols-1 rounded-md bg-white py-1.5 pr-2 pl-3 text-left text-gray-900 outline-1 outline-offset-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="filter-label">
+          <span class="col-start-1 row-start-1 truncate pr-6">Select status</span>
+          <svg class="col-start-1 row-start-1 h-5 w-5 self-center justify-self-end text-gray-500" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.22 10.22a.75.75 0 0 1 1.06 0L8 11.94l1.72-1.72a.75.75 0 1 1 1.06 1.06l-2.25 2.25a.75.75 0 0 1-1.06 0l-2.25-2.25a.75.75 0 0 1 0-1.06ZM10.78 5.78a.75.75 0 0 1-1.06 0L8 4.06 6.28 5.78a.75.75 0 0 1-1.06-1.06l2.25-2.25a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1 0 1.06Z" clip-rule="evenodd" />
+          </svg>
+        </button>
+        <!-- Dropdown popover (hidden by default) -->
+        <ul id="dropdown-menu" class="absolute hidden z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 shadow-lg ring-black/5 sm:text-sm" tabindex="-1" role="listbox" aria-labelledby="filter-label">
+          <li class="hover:bg-indigo-600 hover:text-white relative cursor-default py-2 pl-3 pr-9 text-gray-900 select-none" role="option">
+            <span class="block truncate font-normal">Processed</span>
+            <span class="absolute hidden check-icon inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+              </svg>
+            </span>
+          </li>
+          <li class="hover:bg-indigo-600 hover:text-white relative cursor-default py-2 pl-3 pr-9 text-gray-900 select-none" role="option">
+            <span class="block truncate font-normal">Unprocessed</span>
+            <span class="absolute hidden check-icon inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+              </svg>
+            </span>
+          </li>
+          <li class="hover:bg-indigo-600 hover:text-white relative cursor-default py-2 pl-3 pr-9 text-gray-900 select-none" role="option">
+            <span class="block truncate font-normal">All</span>
+            <span class="absolute hidden check-icon inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
+              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+              </svg>
+            </span>
+          </li>
+          <!-- Add additional items as needed -->
+        </ul>
+      </div>
+  </div>
+
+  <!-- All Recordings Table -->
+  <div class="flow-root">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recording Ended</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="relative px-6 py-3">
+            <span class="sr-only">Edit</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for recording in recordings %}
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ recording.id }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ recording.category.name if recording.category else 'N/A' }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ recording.subcategory.name if recording.subcategory else 'N/A' }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ recording.recording_ended_at.strftime('%b %d, %Y %I:%M %p') if recording.recording_ended_at else 'N/A' }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ recording.company.name if recording.company else 'N/A' }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ recording.status }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <a href="{{ url_for('main.update_metadata', id=recording.id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No recordings found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const dropdownButton = document.getElementById('dropdown-button');
+  const dropdownMenu = document.getElementById('dropdown-menu');
+  
+  // Mapping from display text to filter value
+  const filterMapping = {
+    'Processed': 'processed',
+    'Unprocessed': 'unprocessed',
+    'All': 'all'
+  };
+  
+  // Toggle the dropdown menu on button click.
+  dropdownButton.addEventListener('click', function (e) {
+    e.stopPropagation(); // Prevent event bubbling
+    dropdownMenu.classList.toggle('hidden');
+    const isExpanded = dropdownButton.getAttribute('aria-expanded') === 'true';
+    dropdownButton.setAttribute('aria-expanded', !isExpanded);
+  });
+  
+  // Filtering function to show/hide rows based on status
+  function filterTableByStatus(status) {
+    const rows = document.querySelectorAll("table tbody tr");
+    rows.forEach(row => {
+      const statusCell = row.querySelector("td:nth-child(6)");
+      if (statusCell) {
+        let rowStatus = statusCell.textContent.trim().toLowerCase();
+        if (status === 'all' || rowStatus === status) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      }
+    });
+  }
+  
+  // Update the button text, styling, check icon, and filter the table on item selection.
+  const dropdownItems = dropdownMenu.querySelectorAll('li[role="option"]');
+  dropdownItems.forEach(item => {
+    item.addEventListener('click', function (e) {
+      // Get the displayed text from the clicked item
+      const selectedText = item.querySelector('span.block').innerText;
+      // Update the dropdown button text
+      dropdownButton.querySelector('span').innerText = selectedText;
+      
+      // Remove active styles and hide check icons for all items
+      dropdownItems.forEach(el => {
+        el.classList.remove('bg-indigo-600', 'text-white');
+        const checkIcon = el.querySelector('.check-icon');
+        if (checkIcon) {
+          checkIcon.classList.add('hidden');
+        }
+      });
+      
+      // Apply active styles and show check icon on the selected item
+      item.classList.add('bg-indigo-600', 'text-white');
+      const selectedCheckIcon = item.querySelector('.check-icon');
+      if (selectedCheckIcon) {
+        selectedCheckIcon.classList.remove('hidden');
+      }
+      
+      // Close the dropdown menu
+      dropdownMenu.classList.add('hidden');
+      dropdownButton.setAttribute('aria-expanded', 'false');
+      
+      // Filter the table: map displayed text to the actual filter value
+      const filterValue = filterMapping[selectedText] || selectedText.toLowerCase();
+      filterTableByStatus(filterValue);
+    });
+  });
+  
+  // Pre-select "All" on page load
+  const defaultText = "All";
+  dropdownButton.querySelector('span').innerText = defaultText;
+  dropdownItems.forEach(item => {
+    const text = item.querySelector('span.block').innerText.trim();
+    if (text === defaultText) {
+      item.classList.add('bg-indigo-600', 'text-white');
+      const checkIcon = item.querySelector('.check-icon');
+      if (checkIcon) {
+        checkIcon.classList.remove('hidden');
+      }
+    } else {
+      item.classList.remove('bg-indigo-600', 'text-white');
+      const checkIcon = item.querySelector('.check-icon');
+      if (checkIcon) {
+        checkIcon.classList.add('hidden');
+      }
+    }
+  });
+  filterTableByStatus('all');
+  
+  // Close the dropdown if clicking outside of it.
+  document.addEventListener('click', function (e) {
+    if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+      dropdownMenu.classList.add('hidden');
+      dropdownButton.setAttribute('aria-expanded', 'false');
+    }
+  });
+});
+</script>
+{% endblock %}
