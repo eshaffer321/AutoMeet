@@ -34,7 +34,7 @@ class TranscriptionService:
             if speaker_map:
                 print(speaker_map)
                 # Apply the speaker mapping to the transcription
-                for entry in cleaned_json:
+                for entry in cleaned_json['transcription']:
                     if entry['speaker'] in speaker_map:
                         entry['speaker'] = speaker_map[entry['speaker']]
             serialized_data = json.dumps(cleaned_json).encode('utf-8')

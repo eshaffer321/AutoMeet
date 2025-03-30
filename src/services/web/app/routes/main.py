@@ -33,7 +33,7 @@ def update_metadata(id):
         return "Recording not found", 404
 
     transcription = TranscriptionService().get_transcription(recording.s3_key_merged)
-    speakers = list(set(entry['speaker'] for entry in transcription))
+    speakers = list(set(entry['speaker'] for entry in transcription['transcription']))
 
     categories = SuggestionsService.get_categories()
     transcription_formatted = json.dumps(transcription, indent=2)

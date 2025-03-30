@@ -98,17 +98,19 @@ class AudioPipeline():
         logger.info(f"⏱️ Total duration: {duration} seconds")
         return duration
     
-    def add_metadata(self, merged_result):
+    def create_metadata(self):
         """ Adds metadata to the result. """
-        logger.info("📝 Adding metadata to the result...")
+        logger.info("📝 Creating metadata for the result...")
         duration = self.calculate_duration()
-        merged_result['duration'] = duration
-        self.result['duration'] = duration
-        self.result['language'] = self.language
-        self.result['model_size'] = self.model_size
-        self.result['batch_size'] = self.batch_size
-        self.result['compute_type'] = self.compute_type
-        self.result['device'] = self.device
+        metadata = {
+            'language': self.language,
+            'model_size': self.model_size,
+            'batch_size': self.batch_size,
+            'compute_type': self.compute_type,
+            'device': self.device,
+            'duration': duration,
+        }
+        return metadata
 
    
     def run_pipeline(self):
@@ -118,7 +120,18 @@ class AudioPipeline():
         self.align_output()
         self.assign_speaker_labels()
         merged_results = self.merge_segments()
-        self.add_metadata(merged_results)
+        metadata = self.create_metadata()
+
+        self.result = {
+            'transcription': self.result,
+            'metadata': metadata,
+        }
+
+        merged_results = {
+            'transcription': merged_results,
+            'metadata': metadata,
+        }
+
         logger.info("✅ Audio pipeline complete!")
         return self.result, merged_results
 

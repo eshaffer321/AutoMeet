@@ -58,7 +58,7 @@ def handler(event):
                             "key_raw": raw_s3_key,
                             "merged_key":  merged_s3_key,
                             "recording_ended_at": recording_ended_at,
-                            "duration": raw_result["duration"]})
+                            "duration": raw_result["metadata"]["duration"]})
 
         return {"output": merged_result}
     except Exception as e:
