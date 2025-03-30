@@ -5,25 +5,16 @@ from shared.util.logging import logger
 
 bp = Blueprint('main', __name__)
 
-
-####################
-# Unprocessed Routes
-####################
-@bp.route("/unprocessed")
-def unprocessed():
-    recordings = RecordingService.get_unprocessed()
-    return render_template("unprocessed/unprocessed.html", recordings=recordings)
-
 @bp.route("/")
 def all_recordings():
-    recordings = RecordingService.get_all_recordings()  # Ensure this method returns all recordings.
-    return render_template("all.html", recordings=recordings)
+    recordings = RecordingService.get_all_recordings()
+    return render_template("all_recordings.html", recordings=recordings)
 
 #################
 # Metadata routes
 #################
-@bp.route("/metadata/<id>", methods=["GET"])
-def update_metadata(id):
+@bp.route("/details/edit/<id>", methods=["GET"])
+def edit_recording(id):
     recording = RecordingService.get_recording(id)
     subcategories = []
     if recording.subcategory:
@@ -39,11 +30,29 @@ def update_metadata(id):
     transcription_formatted = json.dumps(transcription, indent=2)
 
     return render_template(
-        "metadata/metadata.html",
+        "recording_details_edit.html",
         recording=recording,
         speakers=speakers,
         categories=categories,
         subcategories=subcategories,
+        transcription=transcription_formatted,
+    )
+
+@bp.route("/details/overview/<id>", methods=["GET"])
+def recording_overview(id):
+    recording = RecordingService.get_recording(id)
+    if not recording:
+        return "Recording not found", 404
+
+    transcription = TranscriptionService().get_transcription(recording.s3_key_merged)
+    speakers = list(set(entry['speaker'] for entry in transcription['transcription']))
+
+    transcription_formatted = json.dumps(transcription, indent=2)
+
+    return render_template(
+        "recording_details_overview.html",
+        recording=recording,
+        speakers=speakers,
         transcription=transcription_formatted,
     )
 

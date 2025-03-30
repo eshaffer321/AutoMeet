@@ -11,14 +11,10 @@
             <!-- Nav Link -->
             <div class="hidden md:block">
               <div class="ml-10 flex items-baseline space-x-4">
-                  <!-- Unprocessed Page -->
-                  <a href="/unprocessed" class="rounded-md px-3 py-2 text-sm font-medium {% if request.path == '/unprocessed' %}bg-gray-900 text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}" aria-current="page">Unprocessed</a>
           
                   <!-- Recordings Page -->
-                  <a href="/recordings" class="rounded-md px-3 py-2 text-sm font-medium {% if request.path == '/recordings' %}bg-gray-900 text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">Recordings</a>
+                  <a href="/" class="rounded-md px-3 py-2 text-sm font-medium {% if request.path == '/' %}bg-gray-900 text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">Recordings</a>
           
-                  <!-- Dashboard / Home Page -->
-                  <a href="/" class="rounded-md px-3 py-2 text-sm font-medium {% if request.path == '/' %}bg-gray-900 text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %}">Dashboard</a>
               </div>
           </div>
 

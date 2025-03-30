@@ -52,6 +52,7 @@
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recording Ended</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -71,6 +72,9 @@
             {{ recording.subcategory.name if recording.subcategory else 'N/A' }}
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ recording.duration|format_duration }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
             {{ recording.recording_ended_at.strftime('%b %d, %Y %I:%M %p') if recording.recording_ended_at else 'N/A' }}
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -78,7 +82,7 @@
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ recording.status }}</td>
           <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <a href="{{ url_for('main.update_metadata', id=recording.id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+            <a href="{{ url_for('main.recording_overview', id=recording.id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
           </td>
         </tr>
         {% else %}
