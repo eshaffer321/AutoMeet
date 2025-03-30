@@ -14,7 +14,7 @@ def unprocessed():
     recordings = RecordingService.get_unprocessed()
     return render_template("unprocessed/unprocessed.html", recordings=recordings)
 
-@bp.route("/recordings")
+@bp.route("/")
 def all_recordings():
     recordings = RecordingService.get_all_recordings()  # Ensure this method returns all recordings.
     return render_template("all.html", recordings=recordings)

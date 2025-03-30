@@ -16,7 +16,7 @@ def handler(data):
     s3_key_raw = data["key_raw"]
     s3_key_merged = data["merged_key"]
     recording_id = data["id"]
-    duration = data["duration"]
+    duration = int(data["duration"])
     # Convert the ISO formatted string to a datetime object
     recording_ended_at = datetime.fromisoformat(data["recording_ended_at"].replace("Z", "+00:00"))
     
