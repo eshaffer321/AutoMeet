@@ -8,12 +8,37 @@
 
 <!-- Meeting Overview Section -->
 <div class="border-b border-gray-200 pb-5 mt-6">
-  <h3 class="text-lg font-bold text-gray-900 leading-6">
-    {{ recording.title or "Meeting Title" }}
-  </h3>
-  <p class="mt-2 max-w-4xl text-sm text-gray-600">
-    {{ recording.description or "This would be a brief but informative description of the meeting." }}
-  </p>
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <!-- Title and Description -->
+    <div>
+      <h3 class="text-2xl font-bold text-gray-900 leading-6">
+        {{ recording.title or "Meeting Title" }}
+      </h3>
+      <p class="mt-2 text-sm text-gray-600">
+        {{ recording.description or "This would be a brief but informative description of the meeting." }}
+      </p>
+    </div>
+
+    <!-- Category and Subcategory with Date -->
+    <div class="mt-4 sm:mt-0 sm:text-right">
+      <div class="flex items-center space-x-2 text-sm text-gray-500">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+          {{ recording.category.name if recording.category else "Uncategorized" }}
+        </span>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+          {{ recording.subcategory.name if recording.subcategory else "No Subcategory" }}
+        </span>
+      </div>
+      <div class="flex items-center space-x-1 text-sm text-gray-500 mt-1">
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3M16 7V3M3 10h18M5 14h14M5 18h14"></path>
+        </svg>
+        <span>
+          {{ recording.recording_ended_at.strftime('%B %d, %Y at %I:%M %p') if recording.recording_ended_at else "Date not available" }}
+        </span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Key Points Section -->
@@ -33,16 +58,16 @@
 <!-- Stats Section -->
 <dl class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
   <!-- Duration Stat -->
-  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200">
-    <dt class="text-sm font-medium text-gray-500">Duration</dt>
+  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200 hover:shadow-md transition-shadow duration-200">
+    <dt class="text-sm font-medium text-gray-500">⏱️ Duration</dt>
     <dd class="mt-1 text-2xl font-semibold text-gray-900">
       {{ recording.duration|format_duration or "N/A" }}
     </dd>
   </div>
 
   <!-- Action Items Stat -->
-  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200">
-    <dt class="text-sm font-medium text-gray-500">Action Items</dt>
+  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200 hover:shadow-md transition-shadow duration-200">
+    <dt class="text-sm font-medium text-gray-500">✅ Action Items</dt>
     <dd class="mt-1 text-2xl font-semibold text-gray-900">
       {% if recording.action_items %}
         {{ recording.action_items }} item(s)
@@ -53,8 +78,8 @@
   </div>
 
   <!-- Decisions Made Stat -->
-  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200">
-    <dt class="text-sm font-medium text-gray-500">Decisions Made</dt>
+  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200 hover:shadow-md transition-shadow duration-200">
+    <dt class="text-sm font-medium text-gray-500">📢 Decisions Made</dt>
     <dd class="mt-1 text-2xl font-semibold text-gray-900">
       {% if recording.decisions_made %}
         {{ recording.decisions_made }} decision(s)
@@ -65,9 +90,9 @@
   </div>
 
   <!-- Other Metric Stat -->
-  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200">
+  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200 hover:shadow-md transition-shadow duration-200">
     <div class="flex justify-between items-center">
-      <dt class="text-sm font-medium text-gray-500">Other Metric</dt>
+      <dt class="text-sm font-medium text-gray-500">📈 Other Metric</dt>
       <dd class="text-xs font-medium text-rose-600">
         +{{ recording.metric_change|default('0.00') }}%
       </dd>
@@ -82,10 +107,18 @@
 <div class="mt-8 bg-gray-50 rounded-lg shadow-sm px-6 py-5 border border-gray-200">
   <h4 class="text-md font-semibold text-gray-700">💡 Suggested Prompts</h4>
   <ul class="mt-2 space-y-2 text-sm text-gray-600">
-    <li>✅ Did you follow up on all previous action items?</li>
-    <li>🎯 Were there any missed opportunities for decisions?</li>
-    <li>🕒 Was the meeting duration aligned with the agenda?</li>
-    <li>🔄 Do any tasks need to be reassigned for efficiency?</li>
+    <li>
+      <span class="text-green-500">✅</span> Did you follow up on all previous action items?
+    </li>
+    <li>
+      <span class="text-red-500">🚨</span> Were there any missed opportunities for decisions?
+    </li>
+    <li>
+      <span class="text-blue-500">🕒</span> Was the meeting duration aligned with the agenda?
+    </li>
+    <li>
+      <span class="text-yellow-500">🔄</span> Do any tasks need to be reassigned for efficiency?
+    </li>
   </ul>
 </div>
 
@@ -95,13 +128,29 @@
     @click="showTranscript = !showTranscript"
     class="w-full text-left font-medium text-blue-600 hover:underline"
   >
-  📚 {% if showTranscript %} Hide Transcript {% else %} Show Full Transcript {% endif %}  
-</button>
+    📚 {% if showTranscript %} Hide Transcript {% else %} Show Full Transcript {% endif %}  
+  </button>
   <div x-show="showTranscript" class="mt-4 bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
-    <pre class="text-sm text-gray-600 whitespace-pre-wrap">
-      {{ recording.transcript or "No transcript available." }}
-    </pre>
+    {% if recording.transcript %}
+      <pre class="text-sm text-gray-600 whitespace-pre-wrap">
+        {{ recording.transcript }}
+      </pre>
+    {% else %}
+      <div class="mt-4 bg-gray-50 rounded-lg px-4 py-3 border border-gray-200 text-center">
+        <p class="text-sm text-gray-400">⚡️ No transcript available. Upload audio or check the processing status.</p>
+      </div>
+    {% endif %}
   </div>
+</div>
+
+<!-- Optional Metadata Tags Section -->
+<div class="flex flex-wrap gap-2 mt-4">
+  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+    🔥 High Priority
+  </span>
+  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+    🧠 Deep Dive Required
+  </span>
 </div>
 
 {% endblock %}
