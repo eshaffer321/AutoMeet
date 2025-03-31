@@ -35,6 +35,7 @@ def edit_recording(id):
         speakers=speakers,
         categories=categories,
         subcategories=subcategories,
+        active_tab='edit',
         transcription=transcription_formatted,
     )
 
@@ -53,8 +54,10 @@ def recording_overview(id):
         "recording_details_overview.html",
         recording=recording,
         speakers=speakers,
+        active_tab='overview',
         transcription=transcription_formatted,
     )
+
 
 @bp.route("/update_metadata/<id>", methods=["POST"])
 def update_metadata_post(id):

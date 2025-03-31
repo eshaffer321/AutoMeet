@@ -2,33 +2,107 @@
 {% extends "base.html" %}
 {% block title %}Update Recording Metadata{% endblock %}
 {% block header %}Update Metadata{% endblock %}
-
 {% block content %}
 
 {% include "partials/_recording_details_nav.html" %}
 
-<!-- Stats -->
-<dl class="mx-auto grid grid-cols-1 gap-px bg-gray-900/5 sm:grid-cols-2 lg:grid-cols-4">
-  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-    <dt class="text-sm/6 font-medium text-gray-500">Duration</dt>
-    <dd class="w-full flex-none text-3xl/10 font-medium tracking-tight text-gray-900">
-      {{ recording.duration|format_duration }}
+<!-- Meeting Overview Section -->
+<div class="border-b border-gray-200 pb-5 mt-6">
+  <h3 class="text-lg font-bold text-gray-900 leading-6">
+    {{ recording.title or "Meeting Title" }}
+  </h3>
+  <p class="mt-2 max-w-4xl text-sm text-gray-600">
+    {{ recording.description or "This would be a brief but informative description of the meeting." }}
+  </p>
+</div>
+
+<!-- Key Points Section -->
+<div class="mt-4 bg-gray-50 rounded-lg shadow-sm px-6 py-5 border border-gray-200">
+  <h4 class="text-md font-semibold text-gray-700">🔎 Key Points</h4>
+  <ul class="mt-2 space-y-2 text-sm text-gray-600 list-disc list-inside">
+    {% if recording.key_points %}
+      {% for point in recording.key_points %}
+        <li>{{ point }}</li>
+      {% endfor %}
+    {% else %}
+      <li class="text-gray-400">No key points available.</li>
+    {% endif %}
+  </ul>
+</div>
+
+<!-- Stats Section -->
+<dl class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+  <!-- Duration Stat -->
+  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200">
+    <dt class="text-sm font-medium text-gray-500">Duration</dt>
+    <dd class="mt-1 text-2xl font-semibold text-gray-900">
+      {{ recording.duration|format_duration or "N/A" }}
     </dd>
   </div>
-  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-    <dt class="text-sm/6 font-medium text-gray-500">Action Items</dt>
-    <dd class="w-full flex-none text-3xl/10 font-medium tracking-tight text-gray-900">3</dd>
+
+  <!-- Action Items Stat -->
+  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200">
+    <dt class="text-sm font-medium text-gray-500">Action Items</dt>
+    <dd class="mt-1 text-2xl font-semibold text-gray-900">
+      {% if recording.action_items %}
+        {{ recording.action_items }} item(s)
+      {% else %}
+        <span class="text-gray-400">No Action Items</span>
+      {% endif %}
+    </dd>
   </div>
-  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-    <dt class="text-sm/6 font-medium text-gray-500">Decisions Made</dt>
-    <dd class="w-full flex-none text-3xl/10 font-medium tracking-tight text-gray-900">0</dd>
+
+  <!-- Decisions Made Stat -->
+  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200">
+    <dt class="text-sm font-medium text-gray-500">Decisions Made</dt>
+    <dd class="mt-1 text-2xl font-semibold text-gray-900">
+      {% if recording.decisions_made %}
+        {{ recording.decisions_made }} decision(s)
+      {% else %}
+        <span class="text-gray-400">No Decisions</span>
+      {% endif %}
+    </dd>
   </div>
-  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 bg-white px-4 py-10 sm:px-6 xl:px-8">
-    <dt class="text-sm/6 font-medium text-gray-500">Other Metric</dt>
-    <dd class="text-xs font-medium text-rose-600">+10.18%</dd>
-    <dd class="w-full flex-none text-3xl/10 font-medium tracking-tight text-gray-900">59</dd>
+
+  <!-- Other Metric Stat -->
+  <div class="bg-white rounded-lg shadow-sm px-6 py-5 border border-gray-200">
+    <div class="flex justify-between items-center">
+      <dt class="text-sm font-medium text-gray-500">Other Metric</dt>
+      <dd class="text-xs font-medium text-rose-600">
+        +{{ recording.metric_change|default('0.00') }}%
+      </dd>
+    </div>
+    <dd class="mt-1 text-2xl font-semibold text-gray-900">
+      {{ recording.other_metric|default('59') }}
+    </dd>
   </div>
 </dl>
+
+<!-- Suggested Prompts / Actionable Insights -->
+<div class="mt-8 bg-gray-50 rounded-lg shadow-sm px-6 py-5 border border-gray-200">
+  <h4 class="text-md font-semibold text-gray-700">💡 Suggested Prompts</h4>
+  <ul class="mt-2 space-y-2 text-sm text-gray-600">
+    <li>✅ Did you follow up on all previous action items?</li>
+    <li>🎯 Were there any missed opportunities for decisions?</li>
+    <li>🕒 Was the meeting duration aligned with the agenda?</li>
+    <li>🔄 Do any tasks need to be reassigned for efficiency?</li>
+  </ul>
+</div>
+
+<!-- Collapsible Transcript Section (Optional) -->
+<div x-data="{ showTranscript: false }" class="mt-6">
+  <button
+    @click="showTranscript = !showTranscript"
+    class="w-full text-left font-medium text-blue-600 hover:underline"
+  >
+  📚 {% if showTranscript %} Hide Transcript {% else %} Show Full Transcript {% endif %}  
+</button>
+  <div x-show="showTranscript" class="mt-4 bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
+    <pre class="text-sm text-gray-600 whitespace-pre-wrap">
+      {{ recording.transcript or "No transcript available." }}
+    </pre>
+  </div>
+</div>
 
 {% endblock %}
 
