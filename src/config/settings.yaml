@@ -39,6 +39,10 @@ runpod_trigger:
 
 metadata_indexer:
   consumer_group: metadata_indexer
+
+ai_enrichment:
+  consumer_group: ai_enrichment
+  model_name: gpt-4o-mini-2024-07-18
   
 web:
 
