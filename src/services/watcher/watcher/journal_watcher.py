@@ -74,7 +74,6 @@ class JournalHandler(FileSystemEventHandler):
         message = {"id": unique_id, "file": filename, "recording_ended_at": timestamp}
         redis_client.xadd(settings.redis.streams.journal_steam_name, message)
         logger.info(f"✅ Published event for: {filename}")
-        self._write_file(PROCESSED_FILE, filename)
         
 
     @staticmethod
