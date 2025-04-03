@@ -66,6 +66,23 @@ class RedisStreamConsumer:
             except Exception as e:
                 logger.error(f"❌ Error handling entry {entry_id}: {e}", exc_info=True)
 
-    def ack(self, message_id):
-        """Acknowledge the processing of a message."""
-        self.client.xack(self.stream_name, self.consumer_group, message_id)
+    def ack(self, message_id, max_retries=5, base_delay=1.0):
+        """Acknowledge the processing of a message with retry logic on connection errors."""
+        for attempt in range(1, max_retries + 1):
+            try:
+                self.client.xack(self.stream_name, self.consumer_group, message_id)
+                return  # Success
+            except RedisConnectionError as e:
+                delay = base_delay * (2 ** (attempt - 1)) + random.uniform(0, 0.5)
+                logger.warning(f"Redis connection error during ack (attempt {attempt}/{max_retries}): {e}")
+                logger.info(f"Retrying in {delay:.2f} seconds...")
+                time.sleep(delay)
+                self.client = get_redis_client()
+            except RedisResponseError as e:
+                logger.error(f"Redis response error during ack for message {message_id}: {e}", exc_info=True)
+                break  # Don't retry on these
+            except Exception as e:
+                logger.error(f"Unexpected error during ack for message {message_id}: {e}", exc_info=True)
+                break  # Avoid retrying unknown exceptions
+        else:
+            logger.error(f"⚠️ Failed to acknowledge message {message_id} after {max_retries} retries.")
