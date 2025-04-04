@@ -1,6 +1,6 @@
 import os
 import uuid
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver as Observer
 from watchdog.events import FileSystemEventHandler
 from config.config import settings
 from shared.clients.redis_client import get_redis_client
@@ -107,10 +107,10 @@ def watch():
     event_handler = JournalHandler()
     logger.info("🔭 Checking for any missed entries since last startup")
     event_handler.process_new_entries()
-    observer.schedule(event_handler, path=os.path.dirname(JOURNAL_FILE), recursive=False)
+    path = os.path.dirname(JOURNAL_FILE)
+    observer.schedule(event_handler, path=path, recursive=False)
     observer.start()
-    
-    logger.info("👀 Continiously monitoring journal for new entries...")
+    logger.info(f"👀 Continiously {path} monitoring journal for new entries...")
 
     def handle_exit(signum, frame):
         """Handles termination signals for a clean exit."""
