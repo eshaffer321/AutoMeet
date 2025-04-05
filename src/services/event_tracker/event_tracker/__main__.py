@@ -1,4 +1,4 @@
-from services.event_tracker.event_tracker.event_tracker import handler 
+from services.event_tracker.event_tracker.event_tracker import consume_stream 
 
 if __name__ == "__main__":
-    handler()
+    consume_stream()

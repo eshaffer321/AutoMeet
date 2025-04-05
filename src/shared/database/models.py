@@ -60,25 +60,25 @@ class Recording(Base):
     company = relationship("Company", back_populates="recordings")
 
 
-# class AIEnrichment(Base):
-#     __tablename__ = "ai_enrichment"
+class AIEnrichment(Base):
+    __tablename__ = "ai_enrichment"
 
-#     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-#     recording_id = Column(String, ForeignKey("recording.id", ondelete="CASCADE"), nullable=False)
-#     title = Column(String, nullable=False)
-#     description = Column(Text, nullable=True)
-#     key_points = Column(Text, nullable=True)  # Store as JSON string
-#     # decisions_made = Column(Text, nullable=True)  # Store as JSON string
-#     # action_items = Column(Text, nullable=True)  # Store as JSON string
-#     # speakers = Column(Text, nullable=True)  # (Optional) Speaker contribution data
-#     # trend_summary = Column(Text, nullable=True)  # (Optional) Aggregated trends/insights
-#     # feedback = Column(Text, nullable=True)  # (Optional) AI feedback on meeting performance
-#     # system_feedback = Column(Text, nullable=True)  # (Optional) Suggestions to improve system
-#     # next_steps = Column(Text, nullable=True)  # (Optional) Next meeting suggestions
-#     created_at = Column(DateTime, default=datetime.now, nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    recording_id = Column(String, ForeignKey("recording.id", ondelete="CASCADE"), nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    key_points = Column(Text, nullable=True)  # Store as JSON string
+    # decisions_made = Column(Text, nullable=True)  # Store as JSON string
+    # action_items = Column(Text, nullable=True)  # Store as JSON string
+    # speakers = Column(Text, nullable=True)  # (Optional) Speaker contribution data
+    # trend_summary = Column(Text, nullable=True)  # (Optional) Aggregated trends/insights
+    # feedback = Column(Text, nullable=True)  # (Optional) AI feedback on meeting performance
+    # system_feedback = Column(Text, nullable=True)  # (Optional) Suggestions to improve system
+    # next_steps = Column(Text, nullable=True)  # (Optional) Next meeting suggestions
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
 
-#     # Relationships
-#     recording = relationship("Recording", back_populates="ai_enrichment")
+    # Relationships
+    recording = relationship("Recording", back_populates="ai_enrichment")
 
 
 class Events(Base):
