@@ -83,6 +83,16 @@ services:
       - prod
       - test
 
+  event_tracker:
+    build:
+      context: .
+      dockerfile: src/services/event_tracker/Dockerfile
+    env_file:
+      - .env
+    profiles:
+      - prod
+      - test
+
 
 volumes:
   redis_data:

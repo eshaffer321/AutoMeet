@@ -79,3 +79,16 @@ class Recording(Base):
 
 #     # Relationships
 #     recording = relationship("Recording", back_populates="ai_enrichment")
+
+
+class Events(Base):
+    __tablename__ = "events"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    recording_id = Column(String, ForeignKey("recording.id", ondelete="CASCADE"), nullable=False)
+    event_type = Column(String, nullable=False)
+    event_timestamp = Column(DateTime, default=datetime.now, nullable=False)
+    details = Column(Text, nullable=True)  # Optional details
+
+    # Relationships
+    recording = relationship("Recording", back_populates="events")
