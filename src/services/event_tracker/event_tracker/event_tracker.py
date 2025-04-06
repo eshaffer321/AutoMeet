@@ -1,8 +1,9 @@
+from datetime import datetime
 import threading
 from shared.clients.redis_client import RedisStreamConsumer 
 from config.config import settings
 from shared.util.logging import logger
-from shared.database.models import Events
+from shared.database.models import Event
 from shared.database.client import SessionLocal
 
 def handler(stream):
@@ -16,14 +17,16 @@ def handler(stream):
     for entry_id, data in consumer.listen():
         logger.info(f"Received message: {data}")
         session = SessionLocal()
-        # Process the message
-        timestamp = entry_id.split("-")[0]
+        timestamp_ms = int(entry_id.split('-')[0])
+        dt = datetime.fromtimestamp(timestamp_ms / 1000.0)
 
         try:
-            event = Events(
+            event = Event(
                 recording_id = data["recording_id"],
-                event_timestamp=timestamp,
-                event_type=stream
+                stream_name=stream,
+                redis_id=entry_id,
+                timestamp=dt,
+                payload=data
             )
             session.add(event)
             session.commit()

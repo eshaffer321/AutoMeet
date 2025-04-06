@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
+from sqlalchemy import JSON, Column, Integer, String, ForeignKey, DateTime, Text
 from sqlalchemy.orm import relationship
 from shared.database.client import Base
 
@@ -58,8 +58,9 @@ class Recording(Base):
     category = relationship("Category", back_populates="recordings")
     subcategory = relationship("Subcategory", back_populates="recordings")
     company = relationship("Company", back_populates="recordings")
-
     ai_enrichment = relationship("AIEnrichment", back_populates="recording", uselist=False, cascade="all, delete")
+    events = relationship("Event", back_populates="recording", cascade="all, delete")
+
 
 
 class AIEnrichment(Base):
@@ -83,14 +84,14 @@ class AIEnrichment(Base):
     recording = relationship("Recording", back_populates="ai_enrichment")
 
 
-class Events(Base):
-    __tablename__ = "events"
-
+class Event(Base):
+    __tablename__ = 'events'
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    recording_id = Column(String, ForeignKey("recording.id", ondelete="CASCADE"), nullable=False)
-    event_type = Column(String, nullable=False)
-    event_timestamp = Column(DateTime, default=datetime.now, nullable=False)
-    details = Column(Text, nullable=True)  # Optional details
+    recording_id = Column(String, ForeignKey("recording.id", ondelete="CASCADE"), nullable=True)  # Link to a recording
+    stream_name = Column(String, nullable=False)
+    redis_id = Column(String, nullable=False, unique=True)
+    timestamp = Column(DateTime, nullable=False)
+    payload = Column(JSON, nullable=True)  # Use JSONB
 
     # Relationships
     recording = relationship("Recording", back_populates="events")
