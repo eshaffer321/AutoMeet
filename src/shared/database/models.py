@@ -59,6 +59,8 @@ class Recording(Base):
     subcategory = relationship("Subcategory", back_populates="recordings")
     company = relationship("Company", back_populates="recordings")
 
+    ai_enrichment = relationship("AIEnrichment", back_populates="recording", uselist=False, cascade="all, delete")
+
 
 class AIEnrichment(Base):
     __tablename__ = "ai_enrichment"
