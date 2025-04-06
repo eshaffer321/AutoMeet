@@ -22,7 +22,7 @@ def handler(stream):
 
         try:
             event = Event(
-                recording_id = data["recording_id"],
+                recording_id = data["id"],
                 stream_name=stream,
                 redis_id=entry_id,
                 timestamp=dt,
