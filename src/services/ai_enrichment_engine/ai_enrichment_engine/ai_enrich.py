@@ -17,7 +17,7 @@ consumer = RedisStreamConsumer(
 client = OpenAI()
 
 BUCKET = settings.s3.bucket_name
-MODEL = settings.ai_enchrichment.model_name
+MODEL = settings.ai_enrichment.model_name
 
 def analyze_transcription(transcription):
 
