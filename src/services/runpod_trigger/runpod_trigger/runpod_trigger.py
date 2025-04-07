@@ -18,7 +18,7 @@ def handler(data):
     job_id = runpod_client.run_async({'key': s3_key, 'id': id, 'recording_ended_at': recording_ended_at}) 
     logger.info(f"Kicked off runpod job {job_id}")
     # Not being used now. For observability in the future
-    consumer.client.xadd("runpod_jobs_fired", {
+    consumer.client.xadd(settings.redis.streams.runpod_jobs_fired, {
         "job_id": job_id,
         "id": id,
         "recording_ended_at": recording_ended_at,

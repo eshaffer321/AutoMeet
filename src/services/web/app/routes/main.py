@@ -1,7 +1,7 @@
 import json
 from flask import Blueprint, render_template, request
-from services.web.app.services import RecordingService, TranscriptionService, SuggestionsService
-from shared.util.logging import logger 
+from services.web.app.services import RecordingService, TranscriptionService, SuggestionsService, EventService
+from shared.util.logging import logger
 
 bp = Blueprint('main', __name__)
 
@@ -10,9 +10,9 @@ def all_recordings():
     recordings = RecordingService.get_all_recordings()
     return render_template("all_recordings.html", recordings=recordings)
 
-#################
-# Metadata routes
-#################
+##############################
+# Recording Details routes
+##############################
 @bp.route("/details/edit/<id>", methods=["GET"])
 def edit_recording(id):
     recording = RecordingService.get_recording(id)
@@ -102,3 +102,22 @@ def update_metadata_post(id):
     except Exception as e:
         logger.error(f"Error processing file: {str(e)}", exc_info=True)
         return "Error", 500
+    
+
+######################
+# Events routes
+######################
+@bp.route("/events", methods=["GET"])
+def all_events():
+    events = EventService.get_all_events()
+    return render_template("all_events.html", events=events)
+
+
+@bp.route("/events/<recording_id>", methods=["GET"])
+def events(recording_id):
+    # Replace this with your actual lookup logic.
+    events = EventService.get_all_events_by_recording_id(recording_id)
+    if not events:
+        return "Event not found", 404
+
+    return render_template("event_details.html", events=events)

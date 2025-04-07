@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}All Events{% endblock %}
+{% block header %}All {% endblock %}
+
+{% block content %}
+
+  <!-- All Events Table -->
+  <div class="flow-root overflow-x-auto">
+    <table class="divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recording ID</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stream Name</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Redis ID</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+          <th class="relative px-6 py-3">
+            <span class="sr-only">Edit</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for event in events %}
+        <tr class="hover:bg-gray-100 cursor-pointer" onclick="window.location='/events/{{ event.recording_id }}'">
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ event.id }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ event.recording_id }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ event.stream_name }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ event.redis_id }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ event.timestamp }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No events found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

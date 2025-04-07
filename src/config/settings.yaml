@@ -5,6 +5,8 @@ redis:
     journal_steam_name: journal
     audio_upload_complete_local: audio_upload_complete_local
     audio_upload_complete_remote: audio_upload_complete_remote
+    runpod_jobs_fired: runpod_jobs_fired
+    recordings_inserted: recordings_inserted
     transcription_complete: transcription_complete
 
 db: 

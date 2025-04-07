@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Event Details{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-8">
+  <!-- Header: Show the recording ID using the first event -->
+  <h1 class="text-2xl font-bold mb-6">
+    Events for Recording {{ events[0].recording_id }}
+  </h1>
+
+  <!-- Timeline Container -->
+  <div class="flow-root">
+    <ul role="list" class="-mb-8">
+      {% for event in events %}
+      <li>
+        <div class="relative pb-8">
+          <!-- Vertical line between timeline items -->
+          {% if not loop.last %}
+          <span
+            class="absolute left-6 top-4 -ml-px h-full w-0.5 bg-gray-200"
+            aria-hidden="true"
+          ></span>
+          {% endif %}
+
+          <div class="relative flex items-start space-x-3">
+            <!-- Dot Indicator -->
+            <div>
+              <span
+                class="relative flex h-8 w-8 flex-none items-center justify-center rounded-full bg-white ring-8 ring-white"
+              >
+                <!-- A colored dot -->
+                <span class="h-3 w-3 rounded-full bg-blue-500"></span>
+              </span>
+            </div>
+
+            <!-- Event Content -->
+            <div class="min-w-0 flex-1">
+              <!-- A subtle "card" background for each event -->
+              <div class="bg-white rounded-md shadow-sm px-4 py-3">
+                <!-- Event Details -->
+                <div class="text-sm text-gray-500">
+                  <p>
+                    <span class="font-medium text-gray-900">Event ID:</span>
+                    {{ event.id }}
+                  </p>
+                  <p>
+                    <span class="font-medium text-gray-900">Stream Name:</span>
+                    {{ event.stream_name }}
+                  </p>
+                  <p>
+                    <span class="font-medium text-gray-900">Redis ID:</span>
+                    {{ event.redis_id }}
+                  </p>
+                </div>
+
+                <!-- Footer row with timestamp + retry button -->
+                <div class="mt-3 flex items-center justify-between">
+                  <time datetime="{{ event.timestamp }}" class="text-sm text-gray-400">
+                    {% if event.timestamp is string %}
+                      {{ event.timestamp }}
+                    {% else %}
+                      {{ event.timestamp.strftime('%b %d, %Y %I:%M %p') }}
+                    {% endif %}
+                  </time>
+                  <!-- Retry button for this event -->
+                  <form action="/events/{{ event.id }}/retry" method="POST">
+                    <button
+                      type="submit"
+                      class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700"
+                    >
+                      Retry
+                    </button>
+                  </form>
+                </div>
+              </div> <!-- End "card" -->
+            </div>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

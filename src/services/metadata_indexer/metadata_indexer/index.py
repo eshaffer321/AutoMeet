@@ -34,6 +34,15 @@ def handler(data):
         session.add(new_recording)
         session.commit()
         logger.info(f"✅ Successfully inserted recording {recording_id} into the database")
+
+        consumer.client.xadd(settings.redis.streams.recordings_inserted, {
+            "id": recording_id,
+            "s3_key_raw": s3_key_raw,
+            "s3_key_merged": s3_key_merged,
+            "recording_ended_at": recording_ended_at.isoformat(),
+            "duration": duration,
+            "timestamp": datetime.now().isoformat()
+        })
     except Exception as e:
         session.rollback()  # Roll back the transaction if any error occurs
         logger.error(f"❌ Failed to insert recording {recording_id} into the database. Error: {e}")
