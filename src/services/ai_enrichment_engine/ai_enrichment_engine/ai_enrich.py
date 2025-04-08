@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from shared.database.client import SessionLocal
 from shared.clients.redis_client import RedisStreamConsumer
@@ -100,6 +101,9 @@ def handler(data):
         session.add( ai_enrichment)
         session.commit()
         logger.info(f"✅ Successfully inserted encrichment for recording {recording_id} into the database")
+        consumer.client.xadd(settings.redis.streams.enrichment_complete, {
+            "id": recording_id,
+        })
     except Exception as e:
         session.rollback()  
         logger.error(f"❌ Failed to insert recording enrichment for {recording_id} into the database. Error: {e}")

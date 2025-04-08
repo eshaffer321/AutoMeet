@@ -1,4 +1,5 @@
 import json
+import re
 from flask import Blueprint, render_template, request
 from services.web.app.services import RecordingService, TranscriptionService, SuggestionsService, EventService
 from shared.util.logging import logger
@@ -44,6 +45,22 @@ def recording_overview(id):
     recording = RecordingService.get_recording(id)
     if not recording:
         return "Recording not found", 404
+    
+    logger.info("Printing AI enrichment details")
+    logger.info(recording.ai_enrichment.__dict__)
+
+    if recording.ai_enrichment:
+        # Suppose this is your key_points string from the database:
+        key_points_str = recording.ai_enrichment.key_points
+
+        # Use a regex to find all content within double quotes
+        key_points_list = re.findall(r'"(.*?)"', key_points_str)
+
+        # Now, key_points_list should be a list of key point strings
+        recording.ai_enrichment.key_points = key_points_list
+
+    print("Printing AI enrichment details as a set")
+    print(recording.ai_enrichment.key_points)
 
     transcription = TranscriptionService().get_transcription(recording.s3_key_merged)
     speakers = list(set(entry['speaker'] for entry in transcription['transcription']))

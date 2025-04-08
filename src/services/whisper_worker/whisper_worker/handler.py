@@ -8,6 +8,7 @@ from services.whisper_worker.whisper_worker.pipeline import AudioPipeline
 
 INPUT_AUDIO_FILE = "audio.mp3"
 TRANSCRIPTION_STREAM = settings.redis.streams.transcription_complete
+TRANSCRIPTION_STARTED = settings.redis.streams.transcription_started
 IS_PUBLISH_ENABLED = settings.whisper_worker.redis_enabled
 
 redis_client = get_redis_client()
@@ -34,7 +35,7 @@ def upload_json_to_s3(base_key: str, suffix: str, data: dict):
     logger.info(f"Upload complete for {s3_path}")
     return s3_path
 
-def publish_message(message):
+def publish_message(message, stream=TRANSCRIPTION_STREAM):
     logger.info(f"Publishing event to {TRANSCRIPTION_STREAM}. Message {message}")
     redis_client.xadd(TRANSCRIPTION_STREAM, message)
 
@@ -43,6 +44,11 @@ def handler(event):
     Pulls audio file from s3, transcribes it with whisperx, and uploads result to s3
     """
     try:
+        publish_message({
+            "id": event["input"]["id"],
+            "status": "started",
+        }, TRANSCRIPTION_STARTED)
+        
         s3_key = event["input"]["key"]
         id = event["input"]["id"]
         recording_ended_at = event["input"]["recording_ended_at"]

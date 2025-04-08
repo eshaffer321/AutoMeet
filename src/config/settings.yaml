@@ -8,6 +8,8 @@ redis:
     runpod_jobs_fired: runpod_jobs_fired
     recordings_inserted: recordings_inserted
     transcription_complete: transcription_complete
+    enrichment_complete: enrichment_complete
+    transcription_started: transcription_started
 
 db: 
   provider: postgres

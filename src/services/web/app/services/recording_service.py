@@ -2,7 +2,7 @@ from re import sub
 from venv import logger
 
 from shared.database.client import SessionLocal
-from shared.database.models import Category, Subcategory, Company, Recording
+from shared.database.models import AIEnrichment, Recording
 from sqlalchemy.orm import joinedload
 from .category_service import CategoryService
 from .company_service import CompanyService
@@ -65,6 +65,11 @@ class RecordingService:
                 .options(joinedload(Recording.company))
                 .options(joinedload(Recording.category))
                 .options(joinedload(Recording.subcategory))
+                .options(
+                    joinedload(Recording.ai_enrichment)
+                    .load_only(AIEnrichment.title)  # Only pull the title field for ai_enrichment
+                )
+                .order_by(Recording.recording_ended_at.desc())
                 .all()
             )
             return recordings
@@ -83,6 +88,7 @@ class RecordingService:
                 .options(joinedload(Recording.company))
                 .options(joinedload(Recording.category))
                 .options(joinedload(Recording.subcategory))
+                .options(joinedload(Recording.ai_enrichment))
                 .filter(Recording.id == id)
                 .first()
             )
