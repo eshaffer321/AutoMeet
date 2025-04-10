@@ -47,7 +47,11 @@ metadata_indexer:
 ai_enrichment:
   consumer_group: ai_enrichment
   model_name: gpt-4o-mini-2024-07-18
-  
+
+notion:
+  consumer_group: notion
+  meeting_database_id: 1d0d9f37f3c48082b320f023af58a603
+ 
 web:
 
 whisper_worker:

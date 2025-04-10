@@ -1,0 +1,6 @@
+notion-client
+redis
+psycopg2-binary
+redis
+dynaconf
+sqlalchemy

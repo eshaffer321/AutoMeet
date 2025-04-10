@@ -2,6 +2,7 @@ app.log
 .env
 .DS_Store
 data/*
+context.md
 
 # terraform
 terraform/secrets.tfvars
