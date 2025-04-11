@@ -4,6 +4,8 @@ from notion_client import Client
 from config.config import settings
 from shared.clients.redis_client import RedisStreamConsumer
 from shared.util.logging import logger
+from shared.database.client import SessionLocal
+from shared.database.models import AIEnrichment
 
 NOTION_SECRET = settings.notion.secret
 MEETING_DATABASE_ID = settings.notion.meeting_database_id
@@ -46,7 +48,7 @@ def insert_new_recording_page(title="No Title", summary="No Summary", type="1:1"
             },
             "Type": {
                 "select": {
-                    "name": type  # or whatever other type you've defined
+                    "name": type
                 }
             }
         }
@@ -55,11 +57,13 @@ def insert_new_recording_page(title="No Title", summary="No Summary", type="1:1"
     logger.info("✅ Page created:", new_page["url"])
 
 def handler(data):
-    result = notion.databases.query(
-        database_id=MEETING_DATABASE_ID
-    )
+    session = SessionLocal()
+    enrichment = session.query(AIEnrichment).filter(AIEnrichment.id == data['id']).first()
+    session.close()
+    if not enrichment:
+        logger.error(f"Enrichment with ID {data['id']} not found.")
 
-    insert_new_recording_page(title=data['id'], summary=data['summary'], type=data['type'])
+    insert_new_recording_page(title=enrichment.title, summary=enrichment.description)
     
 
     

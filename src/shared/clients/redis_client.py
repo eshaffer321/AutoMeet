@@ -4,6 +4,7 @@ from config.config import settings
 from shared.util.logging import logger
 from redis.exceptions import ConnectionError as RedisConnectionError
 from redis.exceptions import ResponseError as RedisResponseError
+import random
 
 def get_redis_client():
     """Helper to initialize a new Redis client."""

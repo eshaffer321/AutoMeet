@@ -5,7 +5,7 @@ from shared.clients.redis_client import RedisStreamConsumer
 from config.config import settings
 from shared.util.logging import logger
 from shared.clients.s3_client import s3
-from shared.database.models import AIEnrichment, Recording
+from shared.database.models import AIEnrichment
 from openai import OpenAI
 
 # Initialize the Redis stream consumer
@@ -23,7 +23,7 @@ MODEL = settings.ai_enrichment.model_name
 def analyze_transcription(transcription):
 
     response = client.responses.create(
-        model="gpt-4o-2024-08-06",
+        model=MODEL,
         input=[
             {
                 "role": "system",
@@ -31,7 +31,7 @@ def analyze_transcription(transcription):
                     "You are an expert meeting summarizer. "
                     "Given a raw meeting transcript, extract the following structured information: "
                     "1) A clear and concise meeting title, "
-                    "2) A short 1–2 sentence summary of the discussion, and "
+                    "2) A very short 1–2 sentence summary of the discussion,"
                     "3) A bullet list of the key points covered. "
                     "Ensure the output strictly matches the provided JSON Schema."
                 )

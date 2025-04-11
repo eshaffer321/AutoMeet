@@ -11,8 +11,6 @@ def handler(stream):
         stream_name=stream,
         consumer_group="event_tracker",
         consumer_name="event_tracker_consumer",
-        block=5000,
-        count=1
     )
     for entry_id, data in consumer.listen():
         logger.info(f"Received message: {data}")
