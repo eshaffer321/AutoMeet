@@ -54,6 +54,9 @@ notion:
  
 web:
 
+openai:
+  api_key:
+
 whisper_worker:
   redis_enabled: true
   local_model_dir: "./model"  # Optional

@@ -69,4 +69,4 @@ def handler(data):
     
 
 def consume_stream():
-    handler({"key": "value"})
+    consumer.process(handler_fn=handler)

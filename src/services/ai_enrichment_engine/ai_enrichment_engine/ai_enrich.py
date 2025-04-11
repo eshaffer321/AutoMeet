@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+import os
 from shared.database.client import SessionLocal
 from shared.clients.redis_client import RedisStreamConsumer
 from config.config import settings
@@ -15,7 +16,10 @@ consumer = RedisStreamConsumer(
     consumer_name="consumer_1"
 )
 
-client = OpenAI()
+if not os.environ.get("OPENAI_API_KEY"):
+    client = OpenAI(api_key=settings.openai.api_key)
+else:
+    client = OpenAI()
 
 BUCKET = settings.s3.bucket_name
 MODEL = settings.ai_enrichment.model_name
