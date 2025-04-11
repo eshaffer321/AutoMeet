@@ -1,4 +1,4 @@
-FROM ghcr.io/jim60105/whisperx:no_model
+FROM ghcr.io/jim60105/whisperx:no_model@sha256:186c5474ca758368ac02f98e8101d5a0eb9d70c6d4d0298e0bdde47968a89765
 
 WORKDIR /src
 
