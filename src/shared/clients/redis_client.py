@@ -72,6 +72,7 @@ class RedisStreamConsumer:
         for attempt in range(1, max_retries + 1):
             try:
                 self.client.xack(self.stream_name, self.consumer_group, message_id)
+                logger.info(f"✅ Acknowledged message {message_id} after {attempt} attempt(s).")
                 return  # Success
             except RedisConnectionError as e:
                 delay = base_delay * (2 ** (attempt - 1)) + random.uniform(0, 0.5)
