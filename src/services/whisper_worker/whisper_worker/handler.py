@@ -37,7 +37,7 @@ def upload_json_to_s3(base_key: str, suffix: str, data: dict):
 
 def publish_message(message, stream=TRANSCRIPTION_STREAM):
     logger.info(f"Publishing event to {TRANSCRIPTION_STREAM}. Message {message}")
-    redis_client.xadd(TRANSCRIPTION_STREAM, message)
+    redis_client.xadd(stream, message)
 
 def handler(event):
     """
