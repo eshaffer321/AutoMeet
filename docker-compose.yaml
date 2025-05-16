@@ -82,6 +82,7 @@ services:
     profiles:
       - prod
       - test
+      - web
     logging:
       driver: json-file
       options:
